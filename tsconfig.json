@@ -18,7 +18,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* Additional */
+    "strictNullChecks": true, // Required by `ts-essentials`
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

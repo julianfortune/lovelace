@@ -1,0 +1,37 @@
+# This is a YAML document
+version: 1
+
+title: Q1 2024 Schedule
+
+holidays:
+  - 1/15/24
+  - 2/24/24
+
+workers:
+  - name: Shannon S.
+    availability:
+      daysOfTheWeek: [M, tues, Friday] # Make the parsing of dates lenient
+      exclude: [2/14/24]
+    additionalWorkload: 2
+  - name: Martha A.
+    availability: ...
+  - ...
+
+shifts:
+  - name: Divorce Court
+    schedule:
+      all: true
+      # dates: []
+      # patterns:
+      #   - daysOfTheWeek: [Monday, Tuesday]
+      #     weeks: [1,2,3]  # not the fourth week)
+      #   - daysOfTheWeek: [thurs]
+      #     weeks: [4]  # only the fourth week
+      # excluding: (specific dates removed)
+    primary:
+      - Shannon S.
+      - Martha A.
+    secondary:
+      - Annie E.
+    backup:
+      - Melissa

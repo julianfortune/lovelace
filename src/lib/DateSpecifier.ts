@@ -1,4 +1,3 @@
-import { Data } from "dataclass";
 import { z } from "zod";
 
 

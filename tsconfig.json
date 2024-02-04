@@ -22,6 +22,7 @@
 
     /* Additional */
     "strictNullChecks": true, // Required by `ts-essentials`
+    "esModuleInterop": true, // Recommended by `jest`
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

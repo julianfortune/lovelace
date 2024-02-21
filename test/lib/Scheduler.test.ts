@@ -1,6 +1,7 @@
 import cases from "jest-in-case";
 import { evaluateSchedule } from '../../src/lib/Scheduler'
 import * as O from 'fp-ts/lib/Option'
+import { set, string } from "fp-ts";
 
 describe('evaluateSchedule', () => {
     cases('Scores correctly', opts => {
@@ -9,7 +10,7 @@ describe('evaluateSchedule', () => {
         'Basic': {
             schedule: new Map([
                 ["Shift A", new Map([
-                    ["2024-02-01", ["Julian"]]
+                    ["2024-02-01", set.fromArray(string.Eq)(["Julian"])]
                 ])]
             ]),
             spec: {
@@ -18,9 +19,7 @@ describe('evaluateSchedule', () => {
                 ],
                 shifts: [{
                     name: "Shift A",
-                    occurrences: new Map([
-                        ["2024-02-01", 1]
-                    ]),
+                    occurrences: [{ date: "2024-02-01", count: 1 }],
                     candidates: new Set(["Julian"])
                 }]
             },

@@ -1,8 +1,7 @@
 import { array, map, number, option, set, string } from "fp-ts"
-import { getApplySemigroup } from "fp-ts/lib/Apply"
 import { Option } from "fp-ts/lib/Option"
 import { concatAll } from "fp-ts/lib/Semigroup"
-import { SemigroupSum } from "fp-ts/lib/number"
+import { mapToArray } from "./util"
 
 // === Input ===
 
@@ -33,28 +32,10 @@ export interface ShiftSpecification {
 
 // === Output ===
 
-export type Schedule = Map<WorkerName, WorkerAssignments>
-export type WorkerAssignments = Map<DateString, ShiftName>
-
-// {
-//     "Julian": {
-//         "2024-01-01": "Shift A",
-//         "2024-01-05": "Shift C",
-//         ...
-//      },
-//     "Abby": { ... },
-//     ...
-// }
-// -- "Worker-oriented approach"
-
-// Binary approach
-// List of shift / time entries where each element is a binary bit-map for the workers
-// []
+export type Schedule = Map<ShiftName, ShiftAssignment>
+export type ShiftAssignment = Map<DateString, Set<WorkerName>>
 
 const concatScores = concatAll(option.getMonoid(number.MonoidSum))(option.some(0))
-
-const mapToArray = <K, A>(map: Map<K, A>) => [...map.entries()]
-const valuesToArray = <K, A>(map: Map<K, A>) => [...map.values()]
 
 const evaluateShiftAssignment = (spec: ShiftSpecification, assignment: ShiftAssignment): Option<number> => {
     // Does each occurrence of the shift have the (exactly) correct number of workers
@@ -107,21 +88,20 @@ const findWorkerSchedule = (schedule: Schedule, worker: string): Map<DateString,
 }
 
 export const evaluateSchedule = (spec: ScheduleSpecification, schedule: Schedule): Option<number> => {
-    const shiftScores = spec.shifts.map((s) => {
-        const assignment = schedule.get(s.name)
+    const shiftScores = mapToArray(spec.shifts).map(([shiftName, spec]) => {
+        const assignment = schedule.get(shiftName)
         if (assignment === undefined) {
-            throw new Error(`Unable to find shift ${s.name} in schedule`)
+            throw new Error(`Unable to find shift ${shiftName} in schedule`)
         }
 
-        return evaluateShiftAssignment(s, assignment)
+        return evaluateShiftAssignment(spec, assignment)
     })
     const totalShiftScore = concatScores(shiftScores)
 
-    const workerScores = spec.workers.map((w) => {
-        // need to figure out all the days scheduled
-        const assignments = findWorkerSchedule(schedule, w.name)
+    const workerScores = mapToArray(spec.workers).map(([workerName, { availability }]) => {
+        const assignments = findWorkerSchedule(schedule, workerName) // all the days scheduled
 
-        return evaluateWorkerAssignments(assignments, w.availability)
+        return evaluateWorkerAssignments(assignments, availability)
     })
     const totalWorkerScore = concatScores(workerScores)
 
@@ -137,7 +117,7 @@ export const evaluateSchedule = (spec: ScheduleSpecification, schedule: Schedule
 // - It would be really cool to have the evaluation functions return structs, and then have a different function to
 //   reduce the struct down to a single value--primarily for debugging purposes
 
-export interface ScheduleEvaluation {
+export type ScheduleEvaluation = {
     workers: Map<WorkerName, WorkerEvaluation>
     shifts: Map<ShiftName, ShiftEvaluation>
 
@@ -145,11 +125,15 @@ export interface ScheduleEvaluation {
     // - Workers' schedules are balanced
 }
 
-export interface WorkerEvaluation {
+export type WorkerEvaluation = {
     unavailableShifts: Map<DateString, ShiftName> // Shifts scheduled but worker is unavailable -- expect to be empty
     conflictingShifts: Map<DateString, Set<ShiftName>>
 }
 
-export interface ShiftEvaluation {
-    occurrences: Map<DateString, Set<WorkerName>>
+export type ShiftEvaluation = {
+    occurrences: Map<DateString, OccurrenceEvaluation>
+}
+
+export type OccurrenceEvaluation = {
+    // ...
 }

@@ -1,31 +1,43 @@
-// // === Genetics ===
+import { Option } from "fp-ts/lib/Option"
 
-// type Gene = ArrayBuffer
-// type Chromosome = Gene[] // [ (Mon Feb 4--DVP) ]
+// === Genetics ===
 
-// // ChromoSer
-// type ChromosomeSerializable<T> = {
-//     toChromosome: ()
-// }
+export type BinaryOptimizationProblem<T> = {
+    chromosomeSizes: number[], // should be 'int' specifically
+    serializer: GenomeSerializable<T>
+    evaluate: (t: T) => Option<number>
+}
 
-// // === Functions ===
+export type Gene = ArrayBuffer
+export type Chromosome = Gene[]
+export type Genome = Chromosome[]
 
-// function createEncoding(input: ScheduleInput): readonly [Chromosome, (c: Chromosome) => Schedule] {
-//     // Create employee bitmap mapping: index -> worker
-//     const workerGeneMap = toIndexMap(input.workers)
 
-//     // Create map: index -> (shift, date, |candidates|)
-//     const shiftChromosomeMap = toIndexMap(input.shifts.flatMap((shift) => {
-//         return [...shift.occurrences.entries()].map(([date, _]) => {
-//             return [{ name: shift.name, date, candidates: shift.candidates }]
-//         })
-//     }))
+export type ChromosomeSerializable<T> = {
+    readonly encode: (value: T) => [Chromosome, (chromosome: Chromosome) => T]
+}
 
-//     const decode: (c: Chromosome) => Schedule = (c) => {
-//         return { shifts: [] }
+export type GenomeSerializable<T> = {
+    readonly encode: (value: T) => [Genome, (genome: Genome) => T]
+}
+
+// === Functions ===
+
+// const findAllCandidatesInSchedule = (schedule: Schedule): Set<string> => new Set(A.flatMap((s: ShiftAssignment): string => s.values())(valuesToArray(schedule)))
+
+// export const ScheduleGenomeSerializable: GenomeSerializable<Schedule> = {
+//     encode: function (schedule: Schedule): Genome {
+//         const workers = findAllCandidatesInSchedule(schedule)
+
+//         const decode: (genome: Genome) => Schedule = (genome) => {
+//             throw Error("Not implemented")
+//             return new Map()
+//         }
+
+//         const c: Chromosome = []
+
+//         return [c, decode] as const
 //     }
-
-//     const c: Chromosome = []
-
-//     return [c, decode] as const
 // }
+
+// [ 0 1 1 0 0 ]   [ 0 0 1 ]

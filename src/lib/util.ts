@@ -22,3 +22,10 @@ export function getRandomElement<A>(arr: Array<A>): A {
     const randomIndex = Math.floor(Math.random() * arr.length);
     return arr[randomIndex];
 }
+
+export function getRandomElementWithIndex<A>(arr: Array<A>): [A, number] {
+    if (arr.length == 0) { throw Error("Map must not be empty!") }
+
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    return [arr[randomIndex], randomIndex];
+}

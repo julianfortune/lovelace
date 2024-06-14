@@ -1,5 +1,5 @@
 import cloneDeep from "lodash.clonedeep"
-import { getRandomElement, getRandomEntry, mapToArray } from "./util"
+import { getRandomElement, getRandomElementWithIndex, mapToArray } from "./util"
 
 // === Input ===
 
@@ -20,7 +20,7 @@ export interface WorkerSpecification {
 
 export interface ShiftSpecification {
     // The days on which the shift occurs and the exact number of workers required
-    occurrences: { date: DateString, count: number }[]
+    occurrences: Map<DateString, ShiftOccurrenceSpecification>
 
     // TODO(later): Need to make this more granular
     // - Maybe this should be specified as Map < worker -> 'weight' > ?
@@ -28,11 +28,15 @@ export interface ShiftSpecification {
     candidates: Set<string>
 }
 
+export interface ShiftOccurrenceSpecification {
+    maxWorkerCount: number
+}
+
 
 // === Output ===
 
-export type Schedule = Map<ShiftName, ShiftAssignment>
-export type ShiftAssignment = Map<DateString, Set<WorkerName>>
+export type Schedule = ScheduleEntry[]
+export type ScheduleEntry = { shift: ShiftName, date: DateString, workers: Set<WorkerName> }
 
 // const evaluateShiftAssignment = (spec: ShiftSpecification, assignment: ShiftAssignment): number => {
 //     // Does each occurrence of the shift have the (exactly) correct number of workers
@@ -68,20 +72,18 @@ export function evaluateWorkerAssignments(assignments: Map<DateString, Set<Shift
 }
 
 // Find what shifts a worker is assigned to for the dates that they're assigned to work
-export const findWorkerSchedule = (schedule: Schedule, worker: WorkerName): Map<DateString, Set<ShiftName>> => {
+export function findWorkerSchedule(schedule: Schedule, worker: WorkerName): Map<DateString, Set<ShiftName>> {
     var workerShiftsByDate: Map<DateString, Set<ShiftName>> = new Map()
 
-    schedule.forEach((assignment, shiftName) => {
-        assignment.forEach((workers: Set<WorkerName>, date: DateString) => {
-            if (workers.has(worker)) {
-                const existingShifts = workerShiftsByDate.get(date)
-                if (existingShifts == undefined) {
-                    workerShiftsByDate.set(date, new Set([shiftName]))
-                } else {
-                    workerShiftsByDate.set(date, existingShifts.add(shiftName))
-                }
+    schedule.forEach(({ shift, date, workers }) => {
+        if (workers.has(worker)) {
+            const existingShifts = workerShiftsByDate.get(date)
+            if (existingShifts == undefined) {
+                workerShiftsByDate.set(date, new Set([shift]))
+            } else {
+                workerShiftsByDate.set(date, existingShifts.add(shift))
             }
-        })
+        }
     });
 
     return workerShiftsByDate
@@ -89,7 +91,7 @@ export const findWorkerSchedule = (schedule: Schedule, worker: WorkerName): Map<
 
 const sum = (a: number, b: number) => a + b
 
-export const evaluateSchedule = (spec: ScheduleSpecification, schedule: Schedule): number => {
+export function evaluateSchedule(spec: ScheduleSpecification, schedule: Schedule): number {
     // Go through all the shifts and check for broken constraints
     // const totalShiftProblemCount = mapToArray(spec.shifts).map(([shiftName, shiftSpec]) => {
     //     const assignment = schedule.get(shiftName)
@@ -166,21 +168,22 @@ export function performOperation(
 }
 
 export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: Schedule): Schedule {
-    // Pick random shift
-    const [shiftName, shiftSpec] = getRandomEntry(spec.shifts)
+    // Pick random entry in schedule
+    const [scheduleEntry, scheduleIndex] = getRandomElementWithIndex(initial)
 
-    // Pick random date
-    const { date, count: maxWorkerCount } = getRandomElement(shiftSpec.occurrences)
+    const shiftSpec = spec.shifts.get(scheduleEntry.shift)
+    if (shiftSpec == undefined) { throw Error(`Unable to find specification for shift ${scheduleEntry.shift}`) }
+    const maxWorkerCount = shiftSpec.occurrences.get(scheduleEntry.date)?.maxWorkerCount
+    if (maxWorkerCount == undefined) { throw Error(`Unable to find occurrence specification for date ${scheduleEntry.date}`) }
 
     // Figure out the current and possible workers
-    const currentWorkers = initial.get(shiftName)?.get(date)
-    if (currentWorkers == undefined) { throw Error("Schedule missing shift / date") }
+    const currentWorkers = scheduleEntry.workers
 
     const alternateWorkers = Array.from(shiftSpec.candidates).filter((c: WorkerName) => {
         const availability = spec.workers.get(c)?.availability
         if (availability == undefined) { throw Error(`No availability found for ${c}`) }
 
-        return availability.has(date) && !currentWorkers.has(c)
+        return availability.has(scheduleEntry.date) && !currentWorkers.has(c)
     })
 
     const operation = getRandomOperation(currentWorkers.size, maxWorkerCount, alternateWorkers.length)
@@ -190,11 +193,9 @@ export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: 
 
     console.log(updatedWorkers)
 
-    // Create copy and replace the current with updated workers
+    // Create copy that replaces the current schedule entry with updated workers
     const newSchedule = cloneDeep(initial)
-    const newShift = newSchedule.get(shiftName)
-    if (newShift == undefined) { throw Error(`Can't find shift ${shiftName}`) }
-    newShift.set(date, updatedWorkers)
+    newSchedule[scheduleIndex] = { shift: scheduleEntry.shift, date: scheduleEntry.date, workers: updatedWorkers }
 
     return newSchedule
 }

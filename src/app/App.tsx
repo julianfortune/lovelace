@@ -6,13 +6,14 @@ function App() {
   const changeHandler = () => {
     const file = inputElement.current?.files?.item(0)
     console.log(file ?? 'No file')
+
     const reader = new FileReader()
     if (file) {
+      reader.readAsText(file)
       reader.onload = (e) => {
         const fileContents = e.target?.result?.toString() ?? ""
         console.log(fileContents)
       }
-      reader.readAsText(file)
     }
   }
 

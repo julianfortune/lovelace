@@ -19,7 +19,7 @@ describe('evaluateSchedule', () => {
                 ]),
                 shifts: new Map([
                     ["Shift A", {
-                        occurrences: [{ date: "2024-02-01", count: 1 }],
+                        occurrences: objToMap({ "2024-02-01": { maxWorkerCount: 1 } }),
                         candidates: new Set(["Julian"])
                     } as ShiftSpecification]
                 ])

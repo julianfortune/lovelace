@@ -1,5 +1,12 @@
 import cases from "jest-in-case";
-import { ShiftSpecification, WorkerSpecification, evaluateSchedule, evaluateWorkerAssignments, findWorkerSchedule, getRandomAdjacentSchedule } from '../../src/lib/Scheduler'
+import {
+    ShiftSpecification,
+    WorkerSpecification,
+    evaluateSchedule,
+    evaluateWorkerAssignments,
+    findWorkerSchedule,
+    getRandomAdjacentSchedule
+} from '../../src/lib/Scheduler'
 import { objToMap } from "../../src/lib/util";
 
 describe('evaluateSchedule', () => {
@@ -7,11 +14,9 @@ describe('evaluateSchedule', () => {
         expect(evaluateSchedule(opts.spec, opts.schedule)).toEqual(opts.score)
     }, {
         'Basic': {
-            schedule: new Map([
-                ["Shift A", new Map([
-                    ["2024-02-01", new Set(["Julian"])]
-                ])]
-            ]),
+            schedule: [
+                { shift: "Shift A", date: "2024-02-01", workers: new Set(["Julian"]) },
+            ],
             spec: {
                 workers: new Map([
                     ["Julian", { availability: new Set(["2024-02-01"]) } as WorkerSpecification],
@@ -67,23 +72,19 @@ describe('findWorkerSchedule', () => {
         expect(findWorkerSchedule(opts.schedule, "Julian")).toEqual(opts.expected)
     }, {
         'Simple': {
-            schedule: new Map([
-                ["Shift A", new Map([
-                    ["2024-02-01", new Set(["Julian"])]
-                ])]
-            ]),
+            schedule: [
+                { shift: "Shift A", date: "2024-02-01", workers: new Set(["Julian"]) },
+            ],
             expected: new Map([
                 ["2024-02-01", new Set(["Shift A"])]
             ])
         },
         'Complex': {
-            schedule: new Map([
-                ["Shift A", objToMap({ "2024-02-01": new Set(["Julian", "Ada"]) })],
-                ["Shift B", objToMap({
-                    "2024-01-02": new Set(["Ada"]),
-                    "2024-02-01": new Set(["Julian", "Ada"])
-                }),]
-            ]),
+            schedule: [
+                { shift: "Shift A", date: "2024-02-01", workers: new Set(["Julian", "Ada"]) },
+                { shift: "Shift B", date: "2024-01-02", workers: new Set(["Ada"]) },
+                { shift: "Shift B", date: "2024-02-01", workers: new Set(["Julian", "Ada"]) },
+            ],
             expected: new Map([
                 ["2024-02-01", new Set(["Shift A", "Shift B"])]
             ])
@@ -91,20 +92,16 @@ describe('findWorkerSchedule', () => {
     });
 });
 
-
-
 describe('getRandomAdjacentSchedule', () => {
     cases('Results in different workers', opts => {
         expect(
-            getRandomAdjacentSchedule(opts.spec, opts.schedule)
-        ).toEqual(undefined)
+            getRandomAdjacentSchedule(opts.spec, opts.schedule)[0].workers
+        ).not.toEqual(new Set(["Julian"]))
     }, {
         'Basic': {
-            schedule: new Map([
-                ["Shift A", new Map([
-                    ["2024-02-01", new Set(["Julian"])]
-                ])]
-            ]),
+            schedule: [
+                { shift: "Shift A", date: "2024-02-01", workers: new Set(["Julian"]) },
+            ],
             spec: {
                 workers: new Map([
                     ["Julian", { availability: new Set(["2024-02-01"]) } as WorkerSpecification],
@@ -112,7 +109,9 @@ describe('getRandomAdjacentSchedule', () => {
                 ]),
                 shifts: new Map([
                     ["Shift A", {
-                        occurrences: [{ date: "2024-02-01", count: 1 }],
+                        occurrences: objToMap({
+                            "2024-02-01": { maxWorkerCount: 1 }
+                        }),
                         candidates: new Set(["Julian", "Ada"])
                     } as ShiftSpecification]
                 ])

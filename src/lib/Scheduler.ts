@@ -187,11 +187,8 @@ export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: 
     })
 
     const operation = getRandomOperation(currentWorkers.size, maxWorkerCount, alternateWorkers.length)
-    console.log(operation)
 
     const updatedWorkers = performOperation(operation, currentWorkers, alternateWorkers)
-
-    console.log(updatedWorkers)
 
     // Create copy that replaces the current schedule entry with updated workers
     const newSchedule = cloneDeep(initial)

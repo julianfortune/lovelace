@@ -10,29 +10,6 @@ export enum DayOfTheWeek {
     Saturday = 'Saturday'
 }
 
-// const ambiguousDayShorthands = new Set(["t", "s"])
-
-// function validateDayOfTheWeek(val: string): boolean {
-//     console.log(`parsing: ${val}`)
-//     if (typeof val !== "string") {
-//         return false;
-//     }
-
-//     const normalizedVal = val.toLowerCase()
-
-//     if (ambiguousDayShorthands.has(normalizedVal)) {
-//         return false; // Ambiguous
-//     }
-
-//     const matchingDay = Object.values(DayOfTheWeek).find((day) => day.toLowerCase().startsWith(normalizedVal))
-
-//     if (matchingDay === undefined) {
-//         return false; // No matching day
-//     }
-
-//     return true
-// }
-
 export const DayOfTheWeekSchema = z.nativeEnum(DayOfTheWeek);
 
 export interface UserPattern {

@@ -1,5 +1,5 @@
 import cases from "jest-in-case";
-import { evaluateSchedule, evaluateWorkerAssignments } from '../../../src/lib/engine/evaluation'
+import { evaluateSchedule, evaluateWorkerAssignments } from '../../../src/lib/optimization/evaluation'
 import { objToMap } from "../../../src/lib/util";
 import { ShiftSpecification, WorkerSpecification } from "../../../src/lib/types/specification";
 

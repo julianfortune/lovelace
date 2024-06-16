@@ -1,6 +1,6 @@
 import cases from "jest-in-case";
-import { getRandomAdjacentSchedule } from '../../../src/lib/engine/annealing'
-import { findWorkerSchedule } from '../../../src/lib/engine/evaluation'
+import { getRandomAdjacentSchedule } from '../../../src/lib/optimization/annealing'
+import { findWorkerSchedule } from '../../../src/lib/optimization/evaluation'
 import { objToMap } from "../../../src/lib/util";
 import { ShiftSpecification, WorkerSpecification } from "../../../src/lib/types/specification";
 

@@ -5,9 +5,16 @@ import { ScheduleSpecification } from "../types/specification"
 import { Schedule } from "../types/schedule"
 
 
-// export function createInitialSchedule(spec: ScheduleSpecification): Schedule {
-
-// }
+export function createRandomSchedule(specification: ScheduleSpecification): Schedule {
+    return Array.from(specification.shifts.entries()).flatMap(([shiftName, shiftSpecification]) => {
+        return Array.from(shiftSpecification.occurrences.entries()).map(([date, occurrenceSpecification]) => {
+            console.log(date, occurrenceSpecification)
+            // TODO: Finish ...
+            const workers = new Set(["..."])
+            return { shift: shiftName, date, workers } // as ScheduleEntry
+        })
+    })
+}
 
 enum Operation {
     Add = 'add',

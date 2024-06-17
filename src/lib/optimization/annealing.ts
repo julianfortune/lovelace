@@ -1,17 +1,17 @@
 import cloneDeep from "lodash.clonedeep"
-import { getRandomElement, getRandomElementWithIndex } from "../util"
+import { chooseRandomElements, getRandomElement, getRandomElementWithIndex } from "../util"
 import { WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
-import { Schedule } from "../types/schedule"
+import { Schedule, ScheduleEntry } from "../types/schedule"
 
 
 export function createRandomSchedule(specification: ScheduleSpecification): Schedule {
-    return Array.from(specification.shifts.entries()).flatMap(([shiftName, shiftSpecification]) => {
+    return Array.from(specification.shifts.entries()).flatMap(([shift, shiftSpecification]) => {
         return Array.from(shiftSpecification.occurrences.entries()).map(([date, occurrenceSpecification]) => {
-            console.log(date, occurrenceSpecification)
-            // TODO: Finish ...
-            const workers = new Set(["..."])
-            return { shift: shiftName, date, workers } // as ScheduleEntry
+            const possibleWorkers = findAlternateWorkers({ shift, date, workers: new Set() }, specification)
+            const workers = new Set(chooseRandomElements(possibleWorkers, occurrenceSpecification.maxWorkerCount))
+
+            return { shift, date, workers } // as ScheduleEntry
         })
     })
 }
@@ -68,28 +68,37 @@ export function performOperation(
     }
 }
 
+// Finds workers that are:
+// - candidates for the shift
+// - available
+// - not already assigned
+// (doesn't check if the worker is assigned to other shifts on the same day)
+export function findAlternateWorkers(
+    scheduleEntry: ScheduleEntry,
+    spec: ScheduleSpecification
+): WorkerName[] {
+    const shiftSpec = spec.shifts.get(scheduleEntry.shift)
+    if (shiftSpec == undefined) { throw Error(`Unable to find specification for shift ${scheduleEntry.shift}`) }
+
+    const allCandidates = Array.from(shiftSpec.candidates)
+
+    return allCandidates.filter((c: WorkerName) => {
+        const availability = spec.workers.get(c)?.availability
+        if (availability == undefined) { throw Error(`No availability found for ${c}`) }
+
+        return availability.has(scheduleEntry.date) && !scheduleEntry.workers.has(c)
+    })
+}
+
 export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: Schedule): Schedule {
     // Pick random entry in schedule
     const [scheduleEntry, scheduleIndex] = getRandomElementWithIndex(initial)
 
-    const shiftSpec = spec.shifts.get(scheduleEntry.shift)
-    if (shiftSpec == undefined) { throw Error(`Unable to find specification for shift ${scheduleEntry.shift}`) }
-    const maxWorkerCount = shiftSpec.occurrences.get(scheduleEntry.date)?.maxWorkerCount
-    if (maxWorkerCount == undefined) { throw Error(`Unable to find occurrence specification for date ${scheduleEntry.date}`) }
-
-    // Figure out the current and possible workers
+    // Identify the current and possible workers
     const currentWorkers = scheduleEntry.workers
+    const alternateWorkers = findAlternateWorkers(scheduleEntry, spec)
 
-    const alternateWorkers = Array.from(shiftSpec.candidates).filter((c: WorkerName) => {
-        const availability = spec.workers.get(c)?.availability
-        if (availability == undefined) { throw Error(`No availability found for ${c}`) }
-
-        return availability.has(scheduleEntry.date) && !currentWorkers.has(c)
-    })
-
-    const operation = getRandomOperation(currentWorkers.size, maxWorkerCount, alternateWorkers.length)
-
-    const updatedWorkers = performOperation(operation, currentWorkers, alternateWorkers)
+    const updatedWorkers = performOperation(Operation.Swap, currentWorkers, alternateWorkers)
 
     // Create copy that replaces the current schedule entry with updated workers
     const newSchedule = cloneDeep(initial)

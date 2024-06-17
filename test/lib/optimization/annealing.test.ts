@@ -1,8 +1,9 @@
-import cases from "jest-in-case";
-import { getRandomAdjacentSchedule } from '../../../src/lib/optimization/annealing'
-import { findWorkerSchedule } from '../../../src/lib/optimization/evaluation'
-import { objToMap } from "../../../src/lib/util";
-import { ShiftSpecification, WorkerSpecification } from "../../../src/lib/types/specification";
+import cases from "jest-in-case"
+import { createRandomSchedule, getRandomAdjacentSchedule } from '../../../src/lib/optimization/annealing'
+import { evaluateSchedule, findWorkerSchedule } from '../../../src/lib/optimization/evaluation'
+import { objToMap } from "../../../src/lib/util"
+import { ShiftSpecification, WorkerSpecification } from "../../../src/lib/types/specification"
+import { SimulatedAnnealing } from "simulated-annealing-ts"
 
 describe('findWorkerSchedule', () => {
     cases('Returns correct shifts', opts => {
@@ -26,8 +27,8 @@ describe('findWorkerSchedule', () => {
                 ["2024-02-01", new Set(["Shift A", "Shift B"])]
             ])
         },
-    });
-});
+    })
+})
 
 describe('getRandomAdjacentSchedule', () => {
     cases('Results in different workers', opts => {
@@ -54,5 +55,48 @@ describe('getRandomAdjacentSchedule', () => {
                 ])
             },
         },
-    });
-});
+    })
+})
+
+describe('scripts', () => {
+    const scheduleSpecification = {
+        workers: new Map([
+            ["Julian", { availability: new Set(["2024-02-01", "2024-02-02"]) } as WorkerSpecification],
+            ["Ada", { availability: new Set(["2024-02-01"]) } as WorkerSpecification],
+            ["Teddy", { availability: new Set(["2024-02-02"]) } as WorkerSpecification]
+        ]),
+        shifts: new Map([
+            ["Shift A", {
+                occurrences: objToMap({
+                    "2024-02-01": { maxWorkerCount: 1 }
+                }),
+                candidates: new Set(["Julian", "Ada"])
+            }],
+            ["Shift B", {
+                occurrences: objToMap({
+                    "2024-02-01": { maxWorkerCount: 1 }
+                }),
+                candidates: new Set(["Julian", "Ada"])
+            }],
+            ["Shift C", {
+                occurrences: objToMap({
+                    "2024-02-02": { maxWorkerCount: 1 }
+                }),
+                candidates: new Set(["Julian", "Ada", "Teddy"])
+            }]
+        ])
+    }
+    test('testing annealing process', () => {
+        const initial = createRandomSchedule(scheduleSpecification)
+        console.log(initial)
+
+        const result = SimulatedAnnealing.run(
+            initial,
+            (state) => evaluateSchedule(scheduleSpecification, state),
+            (state) => getRandomAdjacentSchedule(scheduleSpecification, state)
+        )
+
+        console.log(result)
+        console.log(evaluateSchedule(scheduleSpecification, result))
+    })
+})

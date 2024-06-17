@@ -29,3 +29,10 @@ export function getRandomElementWithIndex<A>(arr: Array<A>): [A, number] {
     const randomIndex = Math.floor(Math.random() * arr.length);
     return [arr[randomIndex], randomIndex];
 }
+
+export const chooseRandomElements = <T>(arr: T[], n: number): T[] => {
+    if (n > arr.length) { throw Error("Array must have length greater than 'n'") }
+
+    const shuffled = Array.from(arr).sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, n);
+};

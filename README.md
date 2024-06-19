@@ -2,17 +2,17 @@
 
 ## TODO
 
-- [] Figure out how to organize `src/`
-- [] Add testing scaffold
-- [] Create library
+- [ ] Set up very basic YAML parsing (from .yaml to `specification` types)
+- [ ] Experiment with simulated annealing (try single month, measure runtime, etc.)
+- [ ] Refactor evaluation to separate gathering problems from reducing to single score
+- [ ] Implement the remaining evaluation rules (target workload, cooldown between shifts, etc.)
+- [ ] Add output rendering (csv? gcal csv?)
+- [ ] Finish front-end MVP
 
-## Libraries
+*Later*
+- [ ] Try to add support for scheduling no one ?
+- [ ] Implement genetic programming optimization
 
-### Functional Programming
-
-[fp-ts](https://gcanti.github.io/fp-ts/)
-[futil](https://smartprocure.github.io/futil-js/)
-[lodash](https://lodash.com/docs/latest)
 
 ## Notes
 
@@ -26,12 +26,6 @@
 - The problem is more complex than Knapsack, but is somewhat related
 
 
-### Functional programming in TS
-
-https://gcanti.github.io/fp-ts/learning-resources/
-https://paulgray.net/typeclasses-in-typescript/
-
-
 ### Approaches
 
 - Genetic algorithms may be a good first place to start
@@ -43,7 +37,3 @@ https://paulgray.net/typeclasses-in-typescript/
     - (Late acceptance) hill climbing
 
 - It may not be worth trying a naive brute-force approach
-
-### Prior Art
-
-[OptaPlanner](https://docs.optaplanner.org/8.33.0.Final/optaplanner-docs/html_single/index.html)

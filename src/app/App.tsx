@@ -1,5 +1,6 @@
 import { Ref, useRef } from "react"
 import { convertYamlScheduleInputsV1ToScheduleSpecification, parseYamlScheduleInputsV1 } from "../lib/input/parse"
+import { findSchedule } from "../lib/optimization/annealing"
 
 function App() {
   const inputElement: Ref<HTMLInputElement> = useRef(null)
@@ -16,7 +17,7 @@ function App() {
         const scheduleInputs = parseYamlScheduleInputsV1(fileContents)
         if (scheduleInputs.success == true) {
           const scheduleSpec = convertYamlScheduleInputsV1ToScheduleSpecification(scheduleInputs.data)
-          console.log(scheduleSpec)
+          findSchedule(scheduleSpec)
         } else {
           alert(`Parsing failed: ${scheduleInputs.error.message}`)
         }

@@ -181,6 +181,8 @@ workers:
       - 2024-06-03
       - 2024-06-04
       - 2024-06-05
+  - name: Liz
+    availability: []
   - name: Rebecca B
     availability:
       - 2024-05-03
@@ -271,7 +273,6 @@ shifts:
     primary:
       - Rebecca B
       - Noah
-      - Monserrat
       - Divine
       - Melissa
 
@@ -332,7 +333,6 @@ shifts:
       - Amy
       - Liz
       - Diane
-      - Leon
     backup:
       - Garrett
 

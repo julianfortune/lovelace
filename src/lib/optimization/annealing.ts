@@ -3,13 +3,19 @@ import { chooseRandomElements, getRandomElement, getRandomElementWithIndex } fro
 import { WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
 import { Schedule, ScheduleEntry } from "../types/schedule"
+import { SimulatedAnnealing } from "simulated-annealing-ts"
+import { evaluateSchedule } from "./evaluation"
 
 
 export function createRandomSchedule(specification: ScheduleSpecification): Schedule {
     return Array.from(specification.shifts.entries()).flatMap(([shift, shiftSpecification]) => {
         return Array.from(shiftSpecification.occurrences.entries()).map(([date, occurrenceSpecification]) => {
             const possibleWorkers = findAlternateWorkers({ shift, date, workers: new Set() }, specification)
-            const workers = new Set(chooseRandomElements(possibleWorkers, occurrenceSpecification.maxWorkerCount))
+
+            var workers = new Set(possibleWorkers)
+            if (possibleWorkers.length > occurrenceSpecification.maxWorkerCount) {
+                workers = new Set(chooseRandomElements(possibleWorkers, occurrenceSpecification.maxWorkerCount))
+            }
 
             return { shift, date, workers } // as ScheduleEntry
         })
@@ -98,11 +104,34 @@ export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: 
     const currentWorkers = scheduleEntry.workers
     const alternateWorkers = findAlternateWorkers(scheduleEntry, spec)
 
-    const updatedWorkers = performOperation(Operation.Swap, currentWorkers, alternateWorkers)
+    if (alternateWorkers.length == 0) {
+        // TODO: Store the count of available workers for each shift somewhere to prevent this issue !
+        // Try again
+        return getRandomAdjacentSchedule(spec, initial)
+    } else {
+        const updatedWorkers = performOperation(Operation.Swap, currentWorkers, alternateWorkers)
 
-    // Create copy that replaces the current schedule entry with updated workers
-    const newSchedule = cloneDeep(initial)
-    newSchedule[scheduleIndex] = { shift: scheduleEntry.shift, date: scheduleEntry.date, workers: updatedWorkers }
+        // Create copy that replaces the current schedule entry with updated workers
+        const newSchedule = cloneDeep(initial)
+        newSchedule[scheduleIndex] = { shift: scheduleEntry.shift, date: scheduleEntry.date, workers: updatedWorkers }
 
-    return newSchedule
+        return newSchedule
+    }
+}
+
+export function findSchedule(scheduleSpecification: ScheduleSpecification) {
+    const initial = createRandomSchedule(scheduleSpecification)
+
+    const result = SimulatedAnnealing.run(
+        initial,
+        (state) => evaluateSchedule(scheduleSpecification, state),
+        (state) => getRandomAdjacentSchedule(scheduleSpecification, state)
+    )
+
+    var outputData = ""
+    result.forEach((entry) =>
+        outputData += `${entry.date},${entry.shift},${Array.from(entry.workers)}\n`
+    )
+
+    console.log(outputData)
 }

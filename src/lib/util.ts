@@ -1,3 +1,5 @@
+import { DateString } from "./types/common";
+
 export function toIndexMap<T>(arr: Array<T>): Map<number, T> {
     return new Map((arr.map((value, index) => [index, value])))
 }
@@ -36,3 +38,6 @@ export const chooseRandomElements = <T>(arr: T[], n: number): T[] => {
     const shuffled = Array.from(arr).sort(() => 0.5 - Math.random());
     return shuffled.slice(0, n);
 };
+
+// Utility function to convert Date to DateString
+export const toDateString = (date: Date): DateString => date.toISOString().split('T')[0];

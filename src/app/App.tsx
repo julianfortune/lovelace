@@ -1,19 +1,28 @@
 import { Ref, useRef } from "react"
+import { convertYamlScheduleInputsV1ToScheduleSpecification, parseYamlScheduleInputsV1 } from "../lib/input/parse"
 
 function App() {
   const inputElement: Ref<HTMLInputElement> = useRef(null)
 
   const changeHandler = () => {
     const file = inputElement.current?.files?.item(0)
-    console.log(file ?? 'No file')
 
     const reader = new FileReader()
     if (file) {
       reader.readAsText(file)
       reader.onload = (e) => {
         const fileContents = e.target?.result?.toString() ?? ""
-        console.log(fileContents)
+
+        const scheduleInputs = parseYamlScheduleInputsV1(fileContents)
+        if (scheduleInputs.success == true) {
+          const scheduleSpec = convertYamlScheduleInputsV1ToScheduleSpecification(scheduleInputs.data)
+          console.log(scheduleSpec)
+        } else {
+          alert(`Parsing failed: ${scheduleInputs.error.message}`)
+        }
       }
+    } else {
+      alert("No file selected!")
     }
   }
 

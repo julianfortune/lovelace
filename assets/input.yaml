@@ -4,7 +4,7 @@ version: 1
 title: Q1 2024 Schedule
 
 holidays:
-  - 6/19/24
+  - 2024-06-19
 
 workers:
   - name: Brett
@@ -274,7 +274,6 @@ shifts:
       - Monserrat
       - Divine
       - Melissa
-    backup: []
 
   - name: EMP # Employment
     schedule:

@@ -17,8 +17,6 @@ holidays:
 # ====== WORKERS ======
 # ---------------------
 
-# TODO: Finish plugging in actual data from Ada
-
 workers:
   - name: Monserrat
     targetWorkload: 5

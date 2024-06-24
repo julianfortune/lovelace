@@ -17,6 +17,7 @@ function App() {
         const scheduleInputs = parseYamlScheduleInputsV1(fileContents)
         if (scheduleInputs.success == true) {
           const scheduleSpec = convertYamlScheduleInputsV1ToScheduleSpecification(scheduleInputs.data)
+
           findSchedule(scheduleSpec)
         } else {
           alert(`Parsing failed: ${scheduleInputs.error.message}`)

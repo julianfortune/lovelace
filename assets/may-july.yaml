@@ -1,0 +1,443 @@
+version: 1
+
+title: May-July 2024
+
+# -------------------
+# ====== DATES ======
+# -------------------
+
+start: 2024-05-01
+end: 2024-07-31 # Inclusive
+holidays:
+  - 2024-05-27
+  - 2024-06-19
+  - 2024-07-04
+
+# ---------------------
+# ====== WORKERS ======
+# ---------------------
+
+# TODO: Finish plugging in actual data from Ada
+
+workers:
+  - name: Monserrat
+    targetWorkload: 5
+    availability:
+      weekDays: All
+
+  - name: Brett
+    targetWorkload: 13
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-08
+        - 2024-05-09
+        - 2024-05-10
+        - 2024-05-13
+        - 2024-07-05
+
+  - name: Courtney
+    targetWorkload: 13
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-01
+        - 2024-05-02
+        - 2024-05-03
+        - 2024-05-06
+        - 2024-05-21
+        - 2024-06-24
+        - 2024-06-25
+        - 2024-06-26
+        - 2024-06-27
+        - 2024-06-28
+        - 2024-07-25
+        - 2024-07-26
+        - 2024-07-29
+        - 2024-07-30
+        - 2024-07-31
+
+  - name: Mason
+    targetWorkload: 20
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-01
+        - 2024-05-02
+        - 2024-05-03
+        - 2024-05-06
+        - 2024-05-07
+        - 2024-05-08
+        - 2024-05-09
+        - 2024-05-10
+        - 2024-05-13
+        - 2024-05-14
+        - 2024-05-21
+        - 2024-06-05
+        - 2024-06-06
+        - 2024-06-07
+        - 2024-06-08
+        - 2024-06-09
+        - 2024-06-10
+        - 2024-06-11
+        - 2024-06-12
+
+  - name: Jill
+    targetWorkload: 4
+    availability: {}
+
+  - name: Emily
+    targetWorkload: 1
+    availability: {}
+
+  - name: Ron
+    targetWorkload: 6
+    availability:
+      weekDays: [Tu, W, Th]
+      excluding:
+        - 2024-07-01
+        - 2024-07-02
+        - 2024-07-03
+        - 2024-07-04
+        - 2024-07-05
+        - 2024-07-06
+        - 2024-07-07
+        - 2024-07-08
+        - 2024-07-09
+        - 2024-07-10
+        - 2024-07-11
+        - 2024-07-12
+        - 2024-07-13
+        - 2024-07-14
+        - 2024-07-15
+
+  - name: Noah
+    targetWorkload: 15
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-02
+        - 2024-05-06
+        - 2024-05-16
+        - 2024-05-17
+        - 2024-06-10
+        - 2024-07-15
+        - 2024-07-16
+        - 2024-07-17
+        - 2024-07-18
+        - 2024-07-19
+
+  - name: Diane
+    targetWorkload: 6
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-01
+        - 2024-05-22
+        - 2024-05-31
+        - 2024-06-14
+        - 2024-07-05
+        - 2024-07-31
+
+  - name: Melissa
+    targetWorkload: 3
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-06
+        - 2024-06-04
+        - 2024-06-24
+        - 2024-06-25
+        - 2024-06-26
+        - 2024-06-27
+        - 2024-06-28
+        - 2024-07-01
+        - 2024-07-02
+        - 2024-07-03
+        - 2024-07-04
+        - 2024-07-05
+        - 2024-07-08
+        - 2024-07-09
+        - 2024-07-10
+        - 2024-07-11
+        - 2024-07-12
+        - 2024-07-15
+        - 2024-07-16
+        - 2024-07-17
+        - 2024-07-18
+        - 2024-07-19
+        - 2024-07-22
+        - 2024-07-23
+        - 2024-07-24
+        - 2024-07-25
+        - 2024-07-26
+        - 2024-07-29
+        - 2024-07-30
+        - 2024-07-31
+
+  - name: Shelby W
+    targetWorkload: 10
+    availability:
+      including:
+        - 2024-07-01
+        - 2024-07-02
+        - 2024-07-03
+        - 2024-07-06
+        - 2024-07-07
+        - 2024-07-08
+        - 2024-07-09
+        - 2024-07-10
+        - 2024-07-13
+        - 2024-07-14
+        - 2024-07-15
+        - 2024-07-16
+        - 2024-07-17
+        - 2024-07-20
+        - 2024-07-21
+        - 2024-07-22
+        - 2024-07-23
+        - 2024-07-24
+        - 2024-07-27
+        - 2024-07-28
+        - 2024-07-29
+        - 2024-07-30
+        - 2024-07-31
+
+  - name: Ivette
+    targetWorkload: 28
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-23
+        - 2024-05-24
+        - 2024-05-28
+        - 2024-06-10
+        - 2024-06-12
+
+  - name: Amy
+    targetWorkload: 10
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-09
+        - 2024-05-10
+        - 2024-05-11
+        - 2024-05-12
+        - 2024-05-13
+        - 2024-05-23
+        - 2024-05-24
+        - 2024-05-25
+        - 2024-05-26
+        - 2024-05-27
+        - 2024-05-28
+        - 2024-05-29
+        - 2024-05-30
+        - 2024-05-31
+        - 2024-06-03
+        - 2024-07-01
+        - 2024-07-02
+        - 2024-07-03
+        - 2024-07-04
+        - 2024-07-05
+
+  - name: Divine
+    targetWorkload: 13
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-30
+        - 2024-05-31
+        - 2024-06-19
+        - 2024-06-20
+        - 2024-06-21
+        - 2024-06-22
+        - 2024-06-23
+        - 2024-06-24
+        - 2024-07-04
+        - 2024-07-05
+        - 2024-07-15
+        - 2024-07-16
+        - 2024-07-17
+        - 2024-07-18
+        - 2024-07-19
+        - 2024-07-20
+        - 2024-07-21
+        - 2024-07-22
+
+  - name: Garrett
+    targetWorkload: 4
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-01
+        - 2024-05-15
+        - 2024-06-04
+        - 2024-07-17
+
+  - name: Bernadette
+    targetWorkload: 16
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-02
+        - 2024-05-03
+        - 2024-05-13
+        - 2024-05-24
+        - 2024-06-04
+        - 2024-06-26
+        - 2024-06-27
+        - 2024-06-28
+        - 2024-06-29
+        - 2024-06-30
+        - 2024-07-01
+
+  - name: Juniper
+    targetWorkload: 26
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-03
+        - 2024-05-06
+        - 2024-05-07
+        - 2024-05-08
+        - 2024-06-03
+        - 2024-06-04
+        - 2024-06-05
+
+  - name: Liz
+    targetWorkload: 3
+    availability:
+      weekDays: All
+
+  - name: Rebecca B
+    targetWorkload: 10
+    availability:
+      weekDays: All
+      excluding:
+        - 2024-05-03
+        - 2024-05-06
+        - 2024-05-16
+        - 2024-05-17
+        - 2024-05-18
+        - 2024-05-19
+        - 2024-05-20
+        - 2024-05-21
+        - 2024-05-22
+        - 2024-05-23
+        - 2024-05-24
+        - 2024-05-25
+        - 2024-05-26
+        - 2024-05-27
+        - 2024-05-28
+        - 2024-05-29
+        - 2024-05-30
+        - 2024-05-31
+        - 2024-06-03
+        - 2024-06-04
+        - 2024-06-05
+        - 2024-06-06
+        - 2024-06-07
+        - 2024-06-10
+        - 2024-06-11
+        - 2024-06-12
+        - 2024-06-13
+        - 2024-06-14
+        - 2024-06-17
+
+# --------------------
+# ====== SHIFTS ======
+# --------------------
+
+shifts:
+  - name: A # Ad Law
+    workload: 6
+    schedule:
+      weekDays: [Th]
+    primary:
+      - Rebecca B
+      - Divine
+      - Noah
+      - Monserrat
+    backup:
+      - Melissa
+
+  - name: PBE # Public Benefit Emergencies
+    workload: 1
+    schedule:
+      weekDays: [M, W]
+    primary:
+      - Monserrat
+      - Rebecca B
+      - Noah
+      - Divine
+      - Melissa
+
+  - name: EMP # Employment
+    workload: 1
+    schedule:
+      weekDays: [Tu]
+    primary:
+      - Rebecca B
+      - Divine
+      - Noah
+    backup:
+      - Diane
+      - Melissa
+
+  - name: H # Housing
+    workload: 3
+    schedule:
+      weekDays: [M, W]
+    primary:
+      - Monserrat
+      - Ron
+      - Amy
+      - Liz
+      - Diane
+    backup:
+      - Garrett
+
+  - name: FLAW # Family Law
+    workload: 1
+    schedule:
+      weekDays: [M]
+    primary:
+      - Courtney
+      - Bernadette
+      - Emily
+    backup:
+      - Mason
+      - Ivette
+      - Juniper
+      - Shelby W
+
+  - name: DVP # Divorce Court
+    workload: 2
+    schedule:
+      weekDays: [M, Tu, Th, F]
+    primary:
+      - Brett
+      - Divine
+      - Rebecca B
+      - Mason
+      - Noah
+      - Amy
+      - Shelby W
+    backup:
+      - Emily
+      - Melissa
+      - Courtney
+      - Jill
+
+  - name: GWY # Gateway
+    workload: 6
+    schedule:
+      weekDays: [M, Tu, Th, F]
+    primary:
+      - Juniper
+      - Ivette
+      - Bernadette
+    backup:
+      - Courtney
+      - Shelby W
+      - Mason

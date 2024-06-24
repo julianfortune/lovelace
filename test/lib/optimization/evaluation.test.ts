@@ -1,7 +1,7 @@
 import cases from "jest-in-case";
-import { evaluateSchedule, evaluateWorkerAssignments } from '../../../src/lib/optimization/evaluation'
-import { objToMap } from "../../../src/lib/util";
+import { evaluateSchedule } from '../../../src/lib/optimization/evaluation';
 import { ShiftSpecification, WorkerSpecification } from "../../../src/lib/types/specification";
+import { objToMap } from "../../../src/lib/util";
 
 describe('evaluateSchedule', () => {
     cases('Scores correctly', opts => {
@@ -23,37 +23,7 @@ describe('evaluateSchedule', () => {
                     } as ShiftSpecification]
                 ])
             },
-            score: 0
+            score: []
         },
     });
 });
-
-// TODO: Fix
-describe('evaluateWorkerAssignments', () => {
-    // cases('Returns correct score', opts => {
-    //     expect(evaluateWorkerAssignments(opts.assignments, opts.availability)).toEqual(opts.expected)
-    // }, {
-    //     'Unavailable': {
-    //         assignments: new Map([
-    //             ["2024-02-02", new Set(["Shift A"])]
-    //         ]),
-    //         availability: new Set("2024-02-01"),
-    //         expected: 1
-    //     },
-    //     'Conflicts': {
-    //         assignments: new Map([
-    //             ["2024-02-01", new Set(["Shift A", "Shift B"])]
-    //         ]),
-    //         availability: new Set("2024-02-01"),
-    //         expected: 2 // TODO(Later): Revisit this..?
-    //     },
-    //     'Complex': {
-    //         assignments: new Map([
-    //             ["2024-02-01", new Set(["Shift A", "Shift B"])],
-    //             ["2024-02-02", new Set(["Shift B"])]
-    //         ]),
-    //         availability: new Set("2024-02-01"),
-    //         expected: 3
-    //     },
-    // });
-})

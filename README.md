@@ -2,10 +2,8 @@
 
 ## TODO
 
-- [ ] !! Fix deployment issue
-
 - [ ] Implement evaluation rule to prefer primary over backup workers (Look for: `TODO(backup)`)
-- [ ] Implement evaluation rule to try to encourage spreading out shifts as evenly as possible (
+- [ ] Implement evaluation rule to try to encourage spreading out shifts as evenly as possible
   - Note: Needs to take into account gaps between beginning of schedule period and first assignment, and last assignment and end of schedule period
   - E.g., Variance of rest days?, workload per week?, ... ?
 

@@ -96,6 +96,8 @@ export function findAlternateWorkers(
     })
 }
 
+// TODO: Figure out which `ScheduleEntry`s have alternate workers available before optimizing; use that
+// array to pick a random scheduleEntry (prevents retries and allows erroring gracefully if nothing can be optimized)
 export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: Schedule): Schedule {
     // Pick random entry in schedule
     const [scheduleEntry, scheduleIndex] = getRandomElementWithIndex(initial)
@@ -105,7 +107,8 @@ export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: 
     const alternateWorkers = findAlternateWorkers(scheduleEntry, spec)
 
     if (alternateWorkers.length == 0) {
-        // TODO: Store the count of available workers for each shift somewhere to prevent this issue !
+        console.log(`No alternate workers available for ${scheduleEntry.shift} on ${scheduleEntry.date}, trying again...`)
+
         // Try again
         return getRandomAdjacentSchedule(spec, initial)
     } else {
@@ -126,10 +129,7 @@ export function findSchedule(scheduleSpecification: ScheduleSpecification) {
         initial,
         (state) => getSchedulePenalty(scheduleSpecification, state),
         (state) => getRandomAdjacentSchedule(scheduleSpecification, state),
-        {
-            maxSteps: 1000,
-            // energyLimit: ??
-        }
+        { maxSteps: 4000 }
     )
 
     var outputData = ""
@@ -138,6 +138,5 @@ export function findSchedule(scheduleSpecification: ScheduleSpecification) {
     )
 
     console.log(outputData)
-
     console.log(evaluateSchedule(scheduleSpecification, result))
 }

@@ -8,18 +8,16 @@ export interface ScheduleSpecification {
 
 export interface WorkerSpecification {
     availability: Set<DateString> // { "2024-02-04", "2024-02-05", ... }
-
-    // TODO(later): Extra constraints for workers (e.g., only X days per week, only X days scheduled in a row, ...)
+    minimumRestDays: number
+    targetWorkload: number // Per month
 }
 
 export interface ShiftSpecification {
     // The days on which the shift occurs and the exact number of workers required
     occurrences: Map<DateString, ShiftOccurrenceSpecification>
-
-    // TODO(later): Need to make this more granular
-    // - Maybe this should be specified as Map < worker -> 'weight' > ?
-    // - Different lists for different levels (e.g., primary, secondary, fallback)
-    candidates: Set<string>
+    candidates: Set<WorkerName>
+    backup: Set<WorkerName> // Using backup worker will incur a penalty
+    workload: number // Workload per shift
 }
 
 export interface ShiftOccurrenceSpecification {

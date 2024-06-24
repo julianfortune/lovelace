@@ -17,10 +17,14 @@ export function convertYamlScheduleInputsV1ToScheduleSpecification(
 ): ScheduleSpecification {
     const workersMap: Map<WorkerName, WorkerSpecification> = new Map(
         inputs.workers.map(worker => {
-            const availabilitySet: Set<DateString> = new Set(
+            const availability: Set<DateString> = new Set(
                 (worker.availability ?? []).map(date => toDateString(date))
             );
-            return [worker.name, { availability: availabilitySet }];
+            return [worker.name, {
+                availability,
+                minimumRestDays: 1, // TODO: Make configurable
+                targetWorkload: worker.targetWorkload
+            }];
         })
     );
 
@@ -29,15 +33,15 @@ export function convertYamlScheduleInputsV1ToScheduleSpecification(
             const occurrences: Map<DateString, ShiftOccurrenceSpecification> = new Map(
                 shift.schedule.map(date => {
                     const dateString = toDateString(date);
-                    // Assuming maxWorkerCount is derived from the primary workers count
-                    const maxWorkerCount = shift.primary.length;
+                    const maxWorkerCount = 1; // TODO: Make configurable
                     return [dateString, { maxWorkerCount }];
                 })
             );
 
-            const candidatesSet: Set<string> = new Set(shift.primary.concat(shift.backup ?? []));
+            const candidates = new Set(shift.primary.concat(shift.backup ?? []));
+            const backup = new Set(shift.backup ?? [])
 
-            return [shift.name, { occurrences, candidates: candidatesSet }];
+            return [shift.name, { occurrences, candidates, backup, workload: shift.workload }];
         })
     );
 

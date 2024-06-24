@@ -1,23 +1,97 @@
-import { mapToArray } from "../util"
+import { mapToArray, toDateString } from "../util"
 import { DateString, ShiftName, WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
 import { Schedule } from "../types/schedule"
 
 
+interface ConstraintViolation {
+    hard: boolean
+    penalty: number
+    message: string
+}
+
+// Helper function to parse date strings into Date objects
+function parseDate(dateStr: DateString): Date {
+    return new Date(dateStr);
+}
+
+// Helper function to get the number of days between two dates
+function daysBetween(d1: Date, d2: Date): number {
+    const diffTime = Math.abs(d2.getTime() - d1.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
 // Counts all instances where a worker is assigned to overlapping shifts
 export function evaluateWorkerAssignments(
+    spec: ScheduleSpecification,
     assignments: Map<DateString, Set<ShiftName>>,
-    availability: Set<DateString>
-): number {
-    var overlappingAssignmentViolations = 0
-    var availabilityViolations = 0
+    workerName: WorkerName
+): ConstraintViolation[] {
+
+    // TODO: Break into multiple functions
+
+    const workerSpec = spec.workers.get(workerName)
+
+    if (workerSpec == null) throw Error(`Unable to find worker specification for ${workerName}!`)
+
+    var constraintViolations: ConstraintViolation[] = []
 
     assignments.forEach((shifts, date) => {
-        overlappingAssignmentViolations += shifts.size > 1 ? 1 : 0
-        availabilityViolations += availability.has(date) ? 0 : 1
+        if (shifts.size > 1) {
+            constraintViolations.push(
+                // TODO: Make configurable
+                { hard: true, penalty: 100, message: `${workerName} scheduled for multiple shifts on ${date}` }
+            )
+        }
     })
 
-    return overlappingAssignmentViolations + availabilityViolations
+    // Calculate rest days between shifts
+    const dates = Array.from(assignments.keys()).map(parseDate).sort((a, b) => a.getTime() - b.getTime());
+
+    // TODO: Refactor to be easier to read
+    for (let i = 1; i < dates.length; i++) {
+        const restDays = daysBetween(dates[i - 1], dates[i]) - 1;
+        const firstDate = toDateString(dates[i - 1])
+        const secondDate = toDateString(dates[i])
+
+        if (restDays < 1) { // TODO: Make configurable
+            constraintViolations.push({
+                hard: true,
+                penalty: restDays == 0 ? 100 : 1 / restDays * 10, // TODO: Make configurable
+                message: `${workerName} has ${restDays} rest day(s) between ${firstDate} and ${secondDate}`
+            })
+        }
+    }
+
+    // Calculate workload per month
+    const workloadPerMonth = new Map<string, number>();
+
+    assignments.forEach((shifts, date) => {
+        const month = date.slice(0, 7); // Extracting the "YYYY-MM" part of the date
+        const existingWorkload = workloadPerMonth.get(month) ?? 0
+
+        const workload = Array.from(shifts).map((shiftName) => {
+            const shiftSpec = spec.shifts.get(shiftName)
+
+            if (shiftSpec == null) throw Error(`Unable to find shift specification for ${shiftName}!`)
+
+            return shiftSpec.workload
+        }).reduce(sum)
+
+        workloadPerMonth.set(month, existingWorkload + workload);
+    });
+
+    workloadPerMonth.forEach((workload, month) => {
+        if (workload > workerSpec.targetWorkload) {
+            constraintViolations.push({
+                hard: false,
+                penalty: workload - workerSpec.targetWorkload,
+                message: `${workerName} has workload of ${workload} for ${month} (aiming for ${workerSpec.targetWorkload})`
+            });
+        }
+    });
+
+    return constraintViolations
 }
 
 // Find what shifts a worker is assigned to for the dates that they're assigned to work
@@ -40,14 +114,24 @@ export function findWorkerSchedule(schedule: Schedule, worker: WorkerName): Map<
 
 const sum = (a: number, b: number) => a + b
 
-export function evaluateSchedule(spec: ScheduleSpecification, schedule: Schedule): number {
-    // Go through all the workers and check for broken constraints
-    const workerProblemCounts = mapToArray(spec.workers).map(([workerName, { availability }]) => {
+export function evaluateSchedule(spec: ScheduleSpecification, schedule: Schedule): ConstraintViolation[] {
+    // Go through all the workers and check for constraint violations
+    const workerConstraintViolations = mapToArray(spec.workers).flatMap(([workerName]) => {
         const assignments = findWorkerSchedule(schedule, workerName) // all the days scheduled
 
-        return evaluateWorkerAssignments(assignments, availability)
+        return evaluateWorkerAssignments(spec, assignments, workerName)
     })
-    const totalWorkerProblemCount = workerProblemCounts.reduce(sum, 0)
 
-    return totalWorkerProblemCount
+    // TODO(backup): Evaluate shift occurrences and penalize using workers from the 'backup' set
+
+    return workerConstraintViolations
+}
+
+export function getSchedulePenalty(spec: ScheduleSpecification, schedule: Schedule): number {
+    // Go through all the workers and check for constraint violations
+    const constraintViolations = evaluateSchedule(spec, schedule)
+
+    const totalPenalty = constraintViolations.map((cv) => cv.penalty).reduce(sum, 0)
+
+    return totalPenalty
 }

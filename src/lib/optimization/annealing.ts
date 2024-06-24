@@ -4,7 +4,7 @@ import { WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
 import { Schedule, ScheduleEntry } from "../types/schedule"
 import { SimulatedAnnealing } from "simulated-annealing-ts"
-import { evaluateSchedule } from "./evaluation"
+import { evaluateSchedule, getSchedulePenalty } from "./evaluation"
 
 
 export function createRandomSchedule(specification: ScheduleSpecification): Schedule {
@@ -124,8 +124,12 @@ export function findSchedule(scheduleSpecification: ScheduleSpecification) {
 
     const result = SimulatedAnnealing.run(
         initial,
-        (state) => evaluateSchedule(scheduleSpecification, state),
-        (state) => getRandomAdjacentSchedule(scheduleSpecification, state)
+        (state) => getSchedulePenalty(scheduleSpecification, state),
+        (state) => getRandomAdjacentSchedule(scheduleSpecification, state),
+        {
+            maxSteps: 1000,
+            // energyLimit: ??
+        }
     )
 
     var outputData = ""
@@ -134,4 +138,6 @@ export function findSchedule(scheduleSpecification: ScheduleSpecification) {
     )
 
     console.log(outputData)
+
+    console.log(evaluateSchedule(scheduleSpecification, result))
 }

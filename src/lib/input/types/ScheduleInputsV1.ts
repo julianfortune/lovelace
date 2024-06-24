@@ -3,10 +3,12 @@ import { z } from "zod";
 export const WorkerInputSchema = z.object({
     name: z.string(),
     availability: z.array(z.date()).optional(),
+    targetWorkload: z.number(),
 })
 
 export const ShiftInputSchema = z.object({
     name: z.string(),
+    workload: z.number(),
     schedule: z.array(z.date()),
     primary: z.array(z.string()),
     backup: z.array(z.string()).optional(),

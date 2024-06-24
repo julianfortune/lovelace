@@ -2,9 +2,11 @@
 
 ## TODO
 
-- [ ] Refactor evaluation to separate gathering problems from reducing to single score
-- [ ] Implement the remaining evaluation rules (target workload, cooldown between shifts, etc.)
+- [ ] Implement evaluation rule to prefer primary over backup workers (Look for: `TODO(backup)`)
+- [ ] Implement evaluation rule to try to encourage spreading out shifts as evenly as possible
+  - E.g., Variance of rest days?, workload per week?, ... ?
 
+- [ ] Add feature to output 'Workload metrics' for each worker by month
 - [ ] Add proper output rendering (csv and gcal csv)
 - [ ] Finish front-end MVP
 

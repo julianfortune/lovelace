@@ -18,7 +18,7 @@ export function convertYamlScheduleInputsV1ToScheduleSpecification(
     const workersMap: Map<WorkerName, WorkerSpecification> = new Map(
         inputs.workers.map(worker => {
             const availability: Set<DateString> = new Set(
-                (worker.availability ?? []).map(date => toDateString(date))
+                (worker.availability).map(date => toDateString(date))
             );
             return [worker.name, {
                 availability,
@@ -38,8 +38,8 @@ export function convertYamlScheduleInputsV1ToScheduleSpecification(
                 })
             );
 
-            const candidates = new Set(shift.primary.concat(shift.backup ?? []));
-            const backup = new Set(shift.backup ?? [])
+            const candidates = new Set(shift.primary.concat(shift.backup));
+            const backup = new Set(shift.backup)
 
             return [shift.name, { occurrences, candidates, backup, workload: shift.workload }];
         })

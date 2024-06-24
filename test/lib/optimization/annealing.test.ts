@@ -1,6 +1,6 @@
 import cases from "jest-in-case"
 import { createRandomSchedule, getRandomAdjacentSchedule } from '../../../src/lib/optimization/annealing'
-import { evaluateSchedule, findWorkerSchedule } from '../../../src/lib/optimization/evaluation'
+import { evaluateSchedule, findWorkerSchedule, getSchedulePenalty } from '../../../src/lib/optimization/evaluation'
 import { objToMap } from "../../../src/lib/util"
 import { ShiftSpecification, WorkerSpecification } from "../../../src/lib/types/specification"
 import { SimulatedAnnealing } from "simulated-annealing-ts"
@@ -70,20 +70,26 @@ describe('scripts', () => {
                 occurrences: objToMap({
                     "2024-02-01": { maxWorkerCount: 1 }
                 }),
-                candidates: new Set(["Julian", "Ada"])
-            }],
+                candidates: new Set(["Julian", "Ada"]),
+                backup: new Set(),
+                workload: 1
+            } as ShiftSpecification],
             ["Shift B", {
                 occurrences: objToMap({
                     "2024-02-01": { maxWorkerCount: 1 }
                 }),
-                candidates: new Set(["Julian", "Ada"])
-            }],
+                candidates: new Set(["Julian", "Ada"]),
+                backup: new Set(),
+                workload: 1
+            } as ShiftSpecification],
             ["Shift C", {
                 occurrences: objToMap({
                     "2024-02-02": { maxWorkerCount: 1 }
                 }),
-                candidates: new Set(["Julian", "Ada", "Teddy"])
-            }]
+                candidates: new Set(["Julian", "Ada", "Teddy"]),
+                backup: new Set(),
+                workload: 1
+            } as ShiftSpecification]
         ])
     }
     test('testing annealing process', () => {
@@ -92,7 +98,7 @@ describe('scripts', () => {
 
         const result = SimulatedAnnealing.run(
             initial,
-            (state) => evaluateSchedule(scheduleSpecification, state),
+            (state) => getSchedulePenalty(scheduleSpecification, state),
             (state) => getRandomAdjacentSchedule(scheduleSpecification, state)
         )
 

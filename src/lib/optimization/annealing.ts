@@ -121,22 +121,3 @@ export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: 
         return newSchedule
     }
 }
-
-export function findSchedule(scheduleSpecification: ScheduleSpecification) {
-    const initial = createRandomSchedule(scheduleSpecification)
-
-    const result = SimulatedAnnealing.run(
-        initial,
-        (state) => getSchedulePenalty(scheduleSpecification, state),
-        (state) => getRandomAdjacentSchedule(scheduleSpecification, state),
-        { maxSteps: 4000 }
-    )
-
-    var outputData = ""
-    result.forEach((entry) =>
-        outputData += `${entry.date},${entry.shift},${Array.from(entry.workers)}\n`
-    )
-
-    console.log(outputData)
-    console.log(evaluateSchedule(scheduleSpecification, result))
-}

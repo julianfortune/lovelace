@@ -1,14 +1,7 @@
 import { mapToArray, toDateString } from "../util"
-import { DateString, ShiftName, WorkerName } from "../types/common"
+import { ConstraintViolation, DateString, ShiftName, WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
 import { Schedule } from "../types/schedule"
-
-
-interface ConstraintViolation {
-    hard: boolean
-    penalty: number
-    message: string
-}
 
 // Helper function to parse date strings into Date objects
 function parseDate(dateStr: DateString): Date {
@@ -57,7 +50,7 @@ export function evaluateWorkerAssignments(
         if (restDays < 1) { // TODO: Make configurable
             constraintViolations.push({
                 hard: true,
-                penalty: restDays == 0 ? 100 : 1 / restDays * 10, // TODO: Make configurable
+                penalty: 100, // TODO: Make configurable
                 message: `${workerName} has ${restDays} rest day(s) between ${firstDate} and ${secondDate}`
             })
         }
@@ -85,7 +78,7 @@ export function evaluateWorkerAssignments(
         if (workload > workerSpec.targetWorkload) {
             constraintViolations.push({
                 hard: false,
-                penalty: workload - workerSpec.targetWorkload,
+                penalty: workload - workerSpec.targetWorkload, // TODO: Raise to a power? E.g., square ?
                 message: `${workerName} has workload of ${workload} for ${month} (aiming for ${workerSpec.targetWorkload})`
             });
         }
@@ -122,9 +115,22 @@ export function evaluateSchedule(spec: ScheduleSpecification, schedule: Schedule
         return evaluateWorkerAssignments(spec, assignments, workerName)
     })
 
-    // TODO(backup): Evaluate shift occurrences and penalize using workers from the 'backup' set
+    const workerSelectionViolations = schedule.flatMap((entry) => {
+        const shiftSpec = spec.shifts.get(entry.shift)
+        if (shiftSpec == null) throw Error(`Unable to find shift specification for ${entry.shift}!`)
 
-    return workerConstraintViolations
+        return Array.from(entry.workers).flatMap((worker) => {
+            if (shiftSpec.backup.has(worker)) {
+                return [{
+                    hard: false,
+                    penalty: 5, // TODO: Configurable
+                    message: `Backup worker ${worker} is assigned to ${entry.shift} on ${entry.date}`
+                } as ConstraintViolation]
+            } else { return [] }
+        })
+    })
+
+    return workerConstraintViolations.concat(workerSelectionViolations)
 }
 
 export function getSchedulePenalty(spec: ScheduleSpecification, schedule: Schedule): number {

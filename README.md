@@ -2,17 +2,18 @@
 
 ## TODO
 
-- [ ] Implement evaluation rule to prefer primary over backup workers (Look for: `TODO(backup)`)
+- [ ] Create `OptimizationParameters` to allow configuring the various constraint penalties
+- [ ] Create a 'submit' driver function that takes input from frontend and returns all data needed for rendering once optimization complete
+- [ ] Add feature to output 'Workload metrics' for each worker and each month
+- [ ] Finish front-end MVP
+- [ ] Add ability to export in CSV and .ICS (https://github.com/nwcell/ics.js)
+
+*Later*
 - [ ] Implement evaluation rule to try to encourage spreading out shifts as evenly as possible
   - Note: Needs to take into account gaps between beginning of schedule period and first assignment, and last assignment and end of schedule period
   - E.g., Variance of rest days?, workload per week?, ... ?
 
-- [ ] Add feature to output 'Workload metrics' for each worker by month
-- [ ] Add proper output rendering (csv and gcal csv)
-- [ ] Finish front-end MVP
-- [ ] Fix/update tests
-
-*Later*
+*Distant*
 - [ ] Add support for taking workers away from shift ? (pay some cost)
 - [ ] Implement genetic programming optimization
 

@@ -12,11 +12,13 @@
   },
   "dependencies": {
     "dataclass": "^2.1.1",
+    "date-fns": "^3.6.0",
     "futil": "^1.76.0",
     "lodash-es": "^4.17.21",
     "lodash.clonedeep": "^4.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-tabs": "^6.0.2",
     "simulated-annealing-ts": "^1.0.1",
     "toml": "^3.0.0",
     "zod": "^3.22.4"

@@ -7,10 +7,22 @@ import { SchedulerParameters, findSchedule } from './core/scheduler';
 function App() {
   const inputElement: Ref<HTMLInputElement> = useRef(null)
 
+  // TODO: Use some sort of form framework ..?
+
   const onSubmit = () => {
     const file = inputElement.current?.files?.item(0)
+
     // TODO: Gather inputs from interface/react values
-    let inputs = {} as SchedulerParameters
+    let inputs = {
+      constraintParameters: {
+        backupWorkerCost: 5,
+        overlappingShiftsCost: 100,
+        insufficientRestCost: 50,
+      },
+      optimizationParameters: {
+        maxSteps: 4000
+      }
+    }
 
     findSchedule(file, inputs, (result) => {
       if (!result.success) {
@@ -90,7 +102,7 @@ function App() {
           >
             <TabList className="">
               <div className="h-16 border-b-2 border-neutral-200 flex text-neutral-400 items-center">
-                {/* TODO(..?): Component */}
+                {/* TODO(..?): Tab component ? */}
                 <Tab className="p-4 flex-grow-0 font-medium hover:cursor-pointer">Schedule</Tab>
                 <Tab className="p-4 flex-grow-0 font-medium hover:cursor-pointer">Problems</Tab>
                 <Tab className="p-4 flex-grow-0 font-medium hover:cursor-pointer">Evaluation</Tab>

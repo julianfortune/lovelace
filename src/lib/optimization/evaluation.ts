@@ -1,5 +1,5 @@
 import { mapToArray, toDateString } from "../util"
-import { ConstraintViolation, DateString, ShiftName, WorkerName } from "../types/common"
+import { ConstraintParameters, ConstraintViolation, DateString, ShiftName, WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
 import { Schedule } from "../types/schedule"
 
@@ -17,8 +17,9 @@ function daysBetween(d1: Date, d2: Date): number {
 // Counts all instances where a worker is assigned to overlapping shifts
 export function evaluateWorkerAssignments(
     spec: ScheduleSpecification,
+    constraintParameters: ConstraintParameters,
     assignments: Map<DateString, Set<ShiftName>>,
-    workerName: WorkerName
+    workerName: WorkerName,
 ): ConstraintViolation[] {
 
     // TODO: Break into multiple functions
@@ -31,10 +32,11 @@ export function evaluateWorkerAssignments(
 
     assignments.forEach((shifts, date) => {
         if (shifts.size > 1) {
-            constraintViolations.push(
-                // TODO: Make configurable
-                { hard: true, penalty: 100, message: `${workerName} scheduled for multiple shifts on ${date}` }
-            )
+            constraintViolations.push({
+                hard: true,
+                penalty: constraintParameters.overlappingShiftsCost,
+                message: `${workerName} scheduled for multiple shifts on ${date}`
+            })
         }
     })
 
@@ -50,7 +52,7 @@ export function evaluateWorkerAssignments(
         if (restDays < 1) { // TODO: Make configurable
             constraintViolations.push({
                 hard: true,
-                penalty: 100, // TODO: Make configurable
+                penalty: constraintParameters.insufficientRestCost,
                 message: `${workerName} has ${restDays} rest day(s) between ${firstDate} and ${secondDate}`
             })
         }
@@ -107,14 +109,19 @@ export function findWorkerSchedule(schedule: Schedule, worker: WorkerName): Map<
 
 const sum = (a: number, b: number) => a + b
 
-export function evaluateSchedule(spec: ScheduleSpecification, schedule: Schedule): ConstraintViolation[] {
+export function evaluateSchedule(
+    spec: ScheduleSpecification,
+    constraintParameters: ConstraintParameters,
+    schedule: Schedule
+): ConstraintViolation[] {
     // Go through all the workers and check for constraint violations
     const workerConstraintViolations = mapToArray(spec.workers).flatMap(([workerName]) => {
         const assignments = findWorkerSchedule(schedule, workerName) // all the days scheduled
 
-        return evaluateWorkerAssignments(spec, assignments, workerName)
+        return evaluateWorkerAssignments(spec, constraintParameters, assignments, workerName)
     })
 
+    // TODO: Function
     const workerSelectionViolations = schedule.flatMap((entry) => {
         const shiftSpec = spec.shifts.get(entry.shift)
         if (shiftSpec == null) throw Error(`Unable to find shift specification for ${entry.shift}!`)
@@ -123,7 +130,7 @@ export function evaluateSchedule(spec: ScheduleSpecification, schedule: Schedule
             if (shiftSpec.backup.has(worker)) {
                 return [{
                     hard: false,
-                    penalty: 5, // TODO: Configurable
+                    penalty: constraintParameters.backupWorkerCost,
                     message: `Backup worker ${worker} is assigned to ${entry.shift} on ${entry.date}`
                 } as ConstraintViolation]
             } else { return [] }
@@ -133,9 +140,13 @@ export function evaluateSchedule(spec: ScheduleSpecification, schedule: Schedule
     return workerConstraintViolations.concat(workerSelectionViolations)
 }
 
-export function getSchedulePenalty(spec: ScheduleSpecification, schedule: Schedule): number {
+export function getSchedulePenalty(
+    spec: ScheduleSpecification,
+    constraintParameters: ConstraintParameters,
+    schedule: Schedule,
+): number {
     // Go through all the workers and check for constraint violations
-    const constraintViolations = evaluateSchedule(spec, schedule)
+    const constraintViolations = evaluateSchedule(spec, constraintParameters, schedule)
 
     const totalPenalty = constraintViolations.map((cv) => cv.penalty).reduce(sum, 0)
 

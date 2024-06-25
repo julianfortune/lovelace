@@ -23,7 +23,7 @@ export type SchedulerResult = {
 
 export function findSchedule(
     file: File | null | undefined,
-    inputs: SchedulerParameters,
+    parameters: SchedulerParameters,
     callback: (result: SchedulerResult) => void
 ) {
     const reader = new FileReader()
@@ -44,25 +44,24 @@ export function findSchedule(
 
         const scheduleSpecification = convertYamlScheduleInputsV1ToScheduleSpecification(scheduleInputs.data)
 
-        // TODO: Function to do some sanity checks ...
-
-        const initial = createRandomSchedule(scheduleSpecification)
+        // TODO: Do some sanity checks ...
 
         const schedule = SimulatedAnnealing.run(
-            initial,
-            (state) => getSchedulePenalty(scheduleSpecification, state),
+            createRandomSchedule(scheduleSpecification),
+            (state) => getSchedulePenalty(scheduleSpecification, parameters.constraintParameters, state),
             (state) => getRandomAdjacentSchedule(scheduleSpecification, state),
-            { maxSteps: 4000 }
+            { maxSteps: parameters.optimizationParameters.maxSteps }
         )
 
-        // TODO: Separate function to gather auxiliary results
-        const constraintViolations = evaluateSchedule(scheduleSpecification, schedule)
+        // Gather auxiliary results
+        const constraintViolations = evaluateSchedule(scheduleSpecification, parameters.constraintParameters, schedule)
+        const workloadEvaluations = [] // TODO
 
         return {
             success: true,
             schedule,
             constraintViolations,
-            workloadEvaluations: [] // TODO
+            workloadEvaluations
         }
     }
 }

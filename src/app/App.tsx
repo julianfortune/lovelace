@@ -2,6 +2,7 @@ import { eachDayOfInterval, endOfWeek, format, isAfter, isBefore, isWeekend, sta
 import { Ref, useRef } from "react";
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { SchedulerParameters, findSchedule } from './core/scheduler';
+import { Schedule } from './components/Schedule';
 
 
 function App() {
@@ -33,32 +34,6 @@ function App() {
       }
     })
   }
-
-  const startOfSchedule = new Date("2024-05-01")
-  const endOfSchedule = new Date("2024-05-31")
-
-  const start = startOfWeek(startOfSchedule);
-  const end = endOfWeek(endOfSchedule);
-  const days = eachDayOfInterval({ start, end });
-
-  const renderDays = () => {
-    return days.map(day => {
-      const isInSchedule = isAfter(day, startOfSchedule) && isBefore(day, endOfSchedule)
-
-      return (
-        <div
-          key={day.toISOString()}
-          className={
-            `p-4 border rounded flex h-32
-            ${isInSchedule ? 'bg-neutral-50' : 'bg-neutral-100'}
-            ${!isInSchedule ? 'text-neutral-400' : ''}`
-          }
-        >
-          <div>{format(day, 'd')}</div>
-        </div>
-      );
-    });
-  };
 
   return (
     <html className="bg-neutral-100">
@@ -117,10 +92,11 @@ function App() {
             <div className="w-full overflow-auto bg-neutral-100">
               <main>
                 <TabPanel>
-                  {/* TODO: Component */}
-                  <div className="p-12 grid xl:grid-cols-7 gap-2">
-                    {renderDays()}
-                  </div>
+                  <Schedule
+                    start={new Date("2024-01-01")}
+                    end={new Date("2024-01-14")}
+                    entries={[]}
+                  />
                 </TabPanel>
 
                 <TabPanel>

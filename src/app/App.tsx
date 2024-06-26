@@ -96,12 +96,12 @@ function App() {
         <div className="flex w-full">
           <Tabs
             className="flex flex-col w-full"
-            selectedTabClassName="text-neutral-800 border-blue-300 border-b-4 pb-0"
+            selectedTabClassName="text-neutral-800 border-blue-300 border-b-4 !pb-0"
           >
             <TabList className="">
               <div className="bg-neutral-50 h-16 pl-4 border-b-2 border-neutral-200 flex text-neutral-400 items-center">
                 {/* TODO(..?): Tab component ? */}
-                <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Schedule</Tab>
+                <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center">Schedule</Tab>
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Problems</Tab>
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Evaluation</Tab>
               </div>

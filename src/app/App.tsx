@@ -99,16 +99,19 @@ function App() {
             selectedTabClassName="text-neutral-800 border-blue-300 border-b-4 !pb-0"
           >
             <TabList className="">
-              <div className="bg-neutral-50 h-16 pl-4 border-b-2 border-neutral-200 flex text-neutral-400 items-center">
+              <div className="bg-neutral-50 h-16 px-4 border-b-2 border-neutral-200 flex text-neutral-400 items-center">
                 {/* TODO(..?): Tab component ? */}
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center">Schedule</Tab>
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Problems</Tab>
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Evaluation</Tab>
+
+                <div className="flex-grow "></div>
+                {/* Action buttons */}
+                <div className="pl-4 text-end text-neutral-600 border-neutral-200 border-l-2 space-x-4 flex items-baseline">
+                  <p>Export</p>
+                  <button className="px-4 py-1 border rounded-full font-medium hover:cursor-pointer ">ICS</button>
+                </div>
               </div>
-              {/* Action buttons
-              <div className="flex-grow flex-col-reverse text-end">
-                <button className="p-4 flex-grow-0 font-medium hover:cursor-pointer ">Export</button>
-              </div> */}
             </TabList>
 
             <div className="w-full overflow-auto bg-neutral-100">

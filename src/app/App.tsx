@@ -1,43 +1,49 @@
 import { Ref, useRef, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import { ScheduleData, SchedulerResult, generateSchedule } from './core/scheduler';
+import { ScheduleData, generateSchedule } from './core/scheduler';
 import { ScheduleGrid } from './components/schedule/ScheduleGrid';
 import { EvaluationDashboard } from "./components/EvaluationDashboard";
 
-
 function App() {
-  const inputElement: Ref<HTMLInputElement> = useRef(null)
+  const inputElement: Ref<HTMLInputElement> = useRef(null);
 
   const [scheduleData, setScheduleData] = useState<ScheduleData | undefined>(undefined);
 
-  const onClickGenerate = () => {
-    const file = inputElement.current?.files?.item(0)
+  const [backupWorkerCost, setBackupWorkerCost] = useState(5);
+  const [overlappingShiftsCost, setOverlappingShiftsCost] = useState(100);
+  const [insufficientRestCost, setInsufficientRestCost] = useState(50);
+  const [weeklyWorkloadEnabled, setWeeklyWorkloadEnabled] = useState(true);
+  const [evenShiftDistributionEnabled, setEvenShiftDistributionEnabled] = useState(true);
+  const [maxSteps, setMaxSteps] = useState(4000);
 
-    // TODO: Connect to interface
-    let inputs = {
+  const onClickGenerate = () => {
+    const file = inputElement.current?.files?.item(0);
+
+    let parameters = {
       constraintParameters: {
-        backupWorkerCost: 5,
-        overlappingShiftsCost: 100,
-        insufficientRestCost: 50,
+        backupWorkerCost,
+        overlappingShiftsCost,
+        insufficientRestCost,
+        weeklyWorkloadEnabled,
+        evenShiftDistributionEnabled
       },
       optimizationParameters: {
-        maxSteps: 4000
+        maxSteps
       }
-    }
+    };
 
-    generateSchedule(file, inputs, (result) => {
+    generateSchedule(file, parameters, (result) => {
       if (!result.success) {
-        alert(result.errorMessage)
+        alert(result.errorMessage);
       } else {
-        setScheduleData(result.data)
+        setScheduleData(result.data);
       }
-    })
-  }
+    });
+  };
 
   return (
     <html className="bg-neutral-100">
       <body className="overflow-hidden flex h-screen">
-
         <div className="h-full border-r-2 border-neutral-200 bg-neutral-50">
           <header className="h-16 w-full flex items-center px-4 border-b-2">
             <h1 className="font-bold text-2xl ">Lovelace Scheduler</h1>
@@ -51,13 +57,71 @@ function App() {
                 name="file"
                 ref={inputElement}
                 accept=".yaml"
-                className="w-64
-                  block border border-neutral-300 rounded-md shadow-smoverflow-clip
-                  file:border-none file:px-2 file:py-1 file:cursor-pointer file:font-medium
-                "
+                className="w-64 block border border-neutral-300 rounded-md shadow-smoverflow-clip file:border-none file:px-2 file:py-1 file:cursor-pointer file:font-medium"
               />
               <p className="text-sm">File must be in YAML format</p>
             </div>
+
+            <h2 className="text-lg font-bold">Constraint Parameters</h2>
+            <div className="space-y-2">
+              <div>
+                <label className="block text-sm font-medium">Backup Worker Cost</label>
+                <input
+                  type="number"
+                  value={backupWorkerCost}
+                  onChange={(e) => setBackupWorkerCost(parseInt(e.target.value))}
+                  className="w-full border border-neutral-300 rounded-md px-2 py-1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Overlapping Shifts Cost</label>
+                <input
+                  type="number"
+                  value={overlappingShiftsCost}
+                  onChange={(e) => setOverlappingShiftsCost(parseInt(e.target.value))}
+                  className="w-full border border-neutral-300 rounded-md px-2 py-1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Insufficient Rest Cost</label>
+                <input
+                  type="number"
+                  value={insufficientRestCost}
+                  onChange={(e) => setInsufficientRestCost(parseInt(e.target.value))}
+                  className="w-full border border-neutral-300 rounded-md px-2 py-1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Weekly Workload Enabled</label>
+                <input
+                  type="checkbox"
+                  checked={weeklyWorkloadEnabled}
+                  onChange={(e) => setWeeklyWorkloadEnabled(e.target.checked)}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Even Shift Distribution Enabled</label>
+                <input
+                  type="checkbox"
+                  checked={evenShiftDistributionEnabled}
+                  onChange={(e) => setEvenShiftDistributionEnabled(e.target.checked)}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            <h2 className="text-lg font-bold">Optimization Parameters</h2>
+            <div>
+              <label className="block text-sm font-medium">Max Steps</label>
+              <input
+                type="number"
+                value={maxSteps}
+                onChange={(e) => setMaxSteps(parseInt(e.target.value))}
+                className="w-full border border-neutral-300 rounded-md px-2 py-1"
+              />
+            </div>
+
             <button
               onClick={onClickGenerate}
               className="px-4 py-2 border rounded hover:bg-neutral-300 border-neutral-300"
@@ -74,7 +138,6 @@ function App() {
           >
             <TabList className="">
               <div className="bg-neutral-50 h-16 px-4 border-b-2 border-neutral-200 flex text-neutral-400 items-center">
-                {/* TODO(..?): Tab component ? */}
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center">Schedule</Tab>
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Evaluation</Tab>
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Workers</Tab>
@@ -109,7 +172,6 @@ function App() {
                 </TabPanel>
 
                 <TabPanel>
-                  {/* TODO: Component */}
                   <div className="p-12">
                     <p>Nothing to evaluate</p>
                   </div>

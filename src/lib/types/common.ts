@@ -9,8 +9,8 @@ export type ConstraintViolation = {
 }
 
 export type WorkloadEvaluation = {
-    worker: WorkerName,
-    month: string,
+    worker: WorkerName
+    month: string
     workload: number
 }
 
@@ -19,7 +19,11 @@ export type OptimizationParameters = {
 }
 
 export type ConstraintParameters = {
-    backupWorkerCost: number,
-    overlappingShiftsCost: number,
+    backupWorkerCost: number
+    overlappingShiftsCost: number
     insufficientRestCost: number
+
+    // Constraint feature flags
+    weeklyWorkloadEnabled: boolean
+    evenShiftDistributionEnabled: boolean
 }

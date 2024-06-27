@@ -1,7 +1,7 @@
 import { SimulatedAnnealing } from "simulated-annealing-ts"
 import { convertYamlScheduleInputsV1ToScheduleSpecification, parseYamlScheduleInputsV1 } from "../../lib/input/parse"
 import { createRandomSchedule, getRandomAdjacentSchedule } from "../../lib/optimization/annealing"
-import { evaluateSchedule, getSchedulePenalty } from "../../lib/optimization/evaluation"
+import { evaluateSchedule, getScheduleTotalCost, getTotalCost } from "../../lib/optimization/evaluation"
 import { ConstraintParameters, ConstraintViolation, OptimizationParameters, WorkloadEvaluation } from "../../lib/types/common"
 import { ScheduleEntry } from "../../lib/types/schedule"
 
@@ -58,15 +58,13 @@ export function generateSchedule(
             return
         }
 
-        console.log(scheduleInputs.data.holidays)
-
         const scheduleSpecification = convertYamlScheduleInputsV1ToScheduleSpecification(scheduleInputs.data)
 
         // TODO: Do some sanity checks ...
 
         const entries = SimulatedAnnealing.run(
             createRandomSchedule(scheduleSpecification),
-            (state) => getSchedulePenalty(scheduleSpecification, parameters.constraintParameters, state),
+            (state) => getScheduleTotalCost(scheduleSpecification, parameters.constraintParameters, state),
             (state) => getRandomAdjacentSchedule(scheduleSpecification, state),
             { maxSteps: parameters.optimizationParameters.maxSteps }
         )
@@ -82,7 +80,7 @@ export function generateSchedule(
         const constraintViolations = evaluateSchedule(
             scheduleSpecification, parameters.constraintParameters, entries
         )
-        const totalCost = getSchedulePenalty(scheduleSpecification, parameters.constraintParameters, entries)
+        const totalCost = getTotalCost(constraintViolations)
 
         const evaluation: Evaluation = {
             totalCost,

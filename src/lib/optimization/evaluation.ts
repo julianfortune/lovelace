@@ -107,6 +107,27 @@ export function findWorkerSchedule(schedule: ScheduleEntry[], worker: WorkerName
     return workerShiftsByDate
 }
 
+function findWorkerSelectionViolations(
+    spec: ScheduleSpecification,
+    constraintParameters: ConstraintParameters,
+    schedule: ScheduleEntry[]
+): ConstraintViolation[] {
+    return schedule.flatMap((entry) => {
+        const shiftSpec = spec.shifts.get(entry.shift)
+        if (shiftSpec == null) throw Error(`Unable to find shift specification for ${entry.shift}!`)
+
+        return Array.from(entry.workers).flatMap((worker) => {
+            if (shiftSpec.backup.has(worker)) {
+                return [{
+                    hard: false,
+                    penalty: constraintParameters.backupWorkerCost,
+                    message: `Backup worker ${worker} is assigned to ${entry.shift} on ${entry.date}`
+                } as ConstraintViolation]
+            } else { return [] }
+        })
+    })
+}
+
 const sum = (a: number, b: number) => a + b
 
 export function evaluateSchedule(
@@ -121,26 +142,16 @@ export function evaluateSchedule(
         return evaluateWorkerAssignments(spec, constraintParameters, assignments, workerName)
     })
 
-    // TODO: Function
-    const workerSelectionViolations = schedule.flatMap((entry) => {
-        const shiftSpec = spec.shifts.get(entry.shift)
-        if (shiftSpec == null) throw Error(`Unable to find shift specification for ${entry.shift}!`)
-
-        return Array.from(entry.workers).flatMap((worker) => {
-            if (shiftSpec.backup.has(worker)) {
-                return [{
-                    hard: false,
-                    penalty: constraintParameters.backupWorkerCost,
-                    message: `Backup worker ${worker} is assigned to ${entry.shift} on ${entry.date}`
-                } as ConstraintViolation]
-            } else { return [] }
-        })
-    })
+    const workerSelectionViolations = findWorkerSelectionViolations(spec, constraintParameters, schedule)
 
     return workerConstraintViolations.concat(workerSelectionViolations)
 }
 
-export function getSchedulePenalty(
+export function getTotalCost(constraintViolations: ConstraintViolation[],): number {
+    return constraintViolations.map((cv) => cv.penalty).reduce(sum, 0)
+}
+
+export function getScheduleTotalCost(
     spec: ScheduleSpecification,
     constraintParameters: ConstraintParameters,
     schedule: ScheduleEntry[],

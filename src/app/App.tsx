@@ -13,8 +13,8 @@ function App() {
   const [scheduleData, setScheduleData] = useState<ScheduleData | undefined>(undefined);
 
   const [backupWorkerCost, setBackupWorkerCost] = useState(5);
-  const [overlappingShiftsCost, setOverlappingShiftsCost] = useState(100);
-  const [insufficientRestCost, setInsufficientRestCost] = useState(50);
+  const [overlappingShiftsCost, setOverlappingShiftsCost] = useState(200);
+  const [insufficientRestCost, setInsufficientRestCost] = useState(100);
   const [weeklyWorkloadEnabled, setWeeklyWorkloadEnabled] = useState(false);
   const [evenShiftDistributionEnabled, setEvenShiftDistributionEnabled] = useState(true);
   const [maxSteps, setMaxSteps] = useState(4000);
@@ -156,8 +156,8 @@ function App() {
           <TabList className="">
             <div className="bg-neutral-50 h-16 px-4 border-b-2 border-neutral-200 flex text-neutral-400 items-center">
               <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center">Schedule</Tab>
-              <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Evaluation</Tab>
               <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Workers</Tab>
+              <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Evaluation</Tab>
 
               <div className="flex-grow "></div>
               {/* Action buttons */}
@@ -182,21 +182,21 @@ function App() {
               </TabPanel>
 
               <TabPanel>
-                {scheduleData?.evaluation ? (
-                  <EvaluationDashboard evaluation={scheduleData?.evaluation} />
-                ) : (
-                  <div className="p-12">
-                    <p>No problems</p>
-                  </div>
-                )}
-              </TabPanel>
-
-              <TabPanel>
                 {scheduleData?.workloadEvaluations ? (
                   <WorkersTable evaluations={scheduleData?.workloadEvaluations} />
                 ) : (
                   <div className="p-12">
                     <p>No workload data available</p>
+                  </div>
+                )}
+              </TabPanel>
+
+              <TabPanel>
+                {scheduleData?.evaluation ? (
+                  <EvaluationDashboard evaluation={scheduleData?.evaluation} />
+                ) : (
+                  <div className="p-12">
+                    <p>No problems</p>
                   </div>
                 )}
               </TabPanel>

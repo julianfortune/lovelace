@@ -2,8 +2,6 @@
 
 ## TODO
 
-- [ ] Add ability to export in CSV and .ICS (https://github.com/nwcell/ics.js)
-
 *Stretch*
 - [ ] Add support for taking workers away from shift ? (pay some cost)
 - [ ] Implement genetic programming optimization

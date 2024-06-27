@@ -1,4 +1,4 @@
-import { format, formatDate, getMonth, isWeekend } from 'date-fns';
+import { format, formatDate, getMonth, isSameDay, isToday, isWeekend } from 'date-fns';
 import { ScheduleEntry } from '../../../lib/types/schedule';
 
 export type DayProps = {
@@ -14,24 +14,27 @@ export function Day({
     isDisabled = false,
     isHoliday = false
 }: DayProps) {
+    const dateIsToday = isToday(date)
+
     return (
         <div
             key={date.toISOString()}
             className={
-                `flex flex-col p-4 min-h-32
+                `flex flex-col p-3 min-h-32
                  border rounded shadow-sm
+                 ${dateIsToday ? 'border-red-400' : ''}
                  ${isHoliday ? '!bg-blue-100 !text-blue-600' : ''}
                  ${isDisabled ? 'text-neutral-400 !bg-neutral-100' : ''}
                  ${isWeekend(date) ? 'bg-neutral-200' : 'bg-neutral-50'}`
             }
         >
-            <div className="flex flex-row space-x-4 items-baseline">
+            <div className="flex flex-row space-x-1 items-baseline pb-2">
                 <div className={`
                     flex-grow text-end
                     ${isHoliday ? 'text-blue-400' : 'text-neutral-400'}`}>
                     {formatDate(date, "MMMM")}
                 </div>
-                <div className='text-lg'>
+                <div className={`px-2 text-lg rounded-full ${dateIsToday ? 'bg-red-400' : ''}`}>
                     {format(date, 'd')}
                 </div>
             </div>

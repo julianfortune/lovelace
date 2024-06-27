@@ -1,7 +1,8 @@
-import { daysBetween, mapToArray, parseDate, sum, toDateString } from "../util"
+import { daysBetween, mapToArray, pairwise, parseDate, sum, toDateString } from "../util"
 import { ConstraintParameters, ConstraintViolation, DateString, ShiftName, WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
 import { ScheduleEntry } from "../types/schedule"
+import { variance } from "mathjs"
 
 // Counts all instances where a worker is assigned to overlapping shifts
 export function evaluateWorkerAssignments(
@@ -32,17 +33,30 @@ export function evaluateWorkerAssignments(
     // Calculate rest days between shifts
     const dates = Array.from(assignments.keys()).map(parseDate).sort((a, b) => a.getTime() - b.getTime());
 
-    // TODO: Refactor to be easier to read
-    for (let i = 1; i < dates.length; i++) {
-        const restDays = daysBetween(dates[i - 1], dates[i]) - 1;
-        const firstDate = toDateString(dates[i - 1])
-        const secondDate = toDateString(dates[i])
+    if (dates.length > 2) {
+        pairwise(dates).forEach(([firstDate, secondDate]) => {
+            const restDays = daysBetween(firstDate, secondDate) - 1;
 
-        if (restDays < 1) { // TODO: Make configurable
+            if (restDays < 1) { // TODO: Make configurable
+                constraintViolations.push({
+                    hard: true,
+                    penalty: constraintParameters.insufficientRestCost,
+                    message: `${workerName} has ${restDays} rest day(s) between ${toDateString(firstDate)} and ${toDateString(secondDate)}`
+                })
+            }
+        })
+
+        if (constraintParameters.evenShiftDistributionEnabled) {
+            // TODO: Take into account gap start of schedule -> first shift & last shift -> end of schedule
+            const restDayCount = pairwise(dates).map(([firstDate, secondDate]) => {
+                return daysBetween(firstDate, secondDate) - 1;
+            })
+            const restVariance = Math.floor(Number(variance(restDayCount, 'unbiased')) / 2)
+
             constraintViolations.push({
-                hard: true,
-                penalty: constraintParameters.insufficientRestCost,
-                message: `${workerName} has ${restDays} rest day(s) between ${firstDate} and ${secondDate}`
+                hard: false,
+                penalty: restVariance,
+                message: `${workerName} has rest variance of ${restVariance}`
             })
         }
     }

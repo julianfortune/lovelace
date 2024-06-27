@@ -16,6 +16,7 @@
     "futil": "^1.76.0",
     "lodash-es": "^4.17.21",
     "lodash.clonedeep": "^4.5.0",
+    "mathjs": "^13.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-tabs": "^6.0.2",

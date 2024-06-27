@@ -25,6 +25,7 @@ export type Evaluation = {
 }
 
 export type ScheduleData = {
+    title: string
     schedule: Schedule
     evaluation: Evaluation
     workloadEvaluations: WorkloadEvaluation[]
@@ -93,6 +94,7 @@ export function generateSchedule(
         callback({
             success: true,
             data: {
+                title: scheduleInputs.data.title,
                 schedule,
                 evaluation,
                 workloadEvaluations

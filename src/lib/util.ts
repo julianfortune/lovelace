@@ -41,6 +41,17 @@ export const chooseRandomElements = <T>(arr: T[], n: number): T[] => {
     return shuffled.slice(0, n);
 };
 
+export function concatenateSet(inputSet: Set<string>): string {
+    let concatenatedString = '';
+    Array.from(inputSet).forEach((str, index, arr) => {
+        concatenatedString += str;
+        if (index < arr.length - 1) {
+            concatenatedString += ', ';
+        }
+    });
+    return concatenatedString;
+}
+
 // Utility function to convert Date to DateString
 export const toDateString = (date: Date): DateString => date.toISOString().split('T')[0];
 

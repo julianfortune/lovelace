@@ -3,6 +3,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { ScheduleData, generateSchedule } from './core/scheduler';
 import { ScheduleGrid } from './components/schedule/ScheduleGrid';
 import { EvaluationDashboard } from "./components/EvaluationDashboard";
+import { WorkersTable } from "./components/WorkersTable";
 
 function App() {
   const inputElement: Ref<HTMLInputElement> = useRef(null);
@@ -12,7 +13,7 @@ function App() {
   const [backupWorkerCost, setBackupWorkerCost] = useState(5);
   const [overlappingShiftsCost, setOverlappingShiftsCost] = useState(100);
   const [insufficientRestCost, setInsufficientRestCost] = useState(50);
-  const [weeklyWorkloadEnabled, setWeeklyWorkloadEnabled] = useState(true);
+  const [weeklyWorkloadEnabled, setWeeklyWorkloadEnabled] = useState(false);
   const [evenShiftDistributionEnabled, setEvenShiftDistributionEnabled] = useState(true);
   const [maxSteps, setMaxSteps] = useState(4000);
 
@@ -91,17 +92,18 @@ function App() {
                   className="w-full border border-neutral-300 rounded-md px-2 py-1"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium">Weekly Workload Enabled</label>
+              {/* Feature not yet implemented */}
+              {/* <div>
+                <label className="block text-sm font-medium">Weekly Workload</label>
                 <input
                   type="checkbox"
                   checked={weeklyWorkloadEnabled}
                   onChange={(e) => setWeeklyWorkloadEnabled(e.target.checked)}
                   className="w-full"
                 />
-              </div>
+              </div> */}
               <div>
-                <label className="block text-sm font-medium">Even Shift Distribution Enabled</label>
+                <label className="block text-sm font-medium">Even Shift Distribution</label>
                 <input
                   type="checkbox"
                   checked={evenShiftDistributionEnabled}
@@ -172,9 +174,13 @@ function App() {
                 </TabPanel>
 
                 <TabPanel>
-                  <div className="p-12">
-                    <p>Nothing to evaluate</p>
-                  </div>
+                  {scheduleData?.workloadEvaluations ? (
+                    <WorkersTable evaluations={scheduleData?.workloadEvaluations} />
+                  ) : (
+                    <div className="p-12">
+                      <p>No workload data available</p>
+                    </div>
+                  )}
                 </TabPanel>
               </main>
             </div>

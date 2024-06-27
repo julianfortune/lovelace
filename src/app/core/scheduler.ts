@@ -4,6 +4,7 @@ import { createRandomSchedule, getRandomAdjacentSchedule } from "../../lib/optim
 import { evaluateSchedule, getScheduleTotalCost, getTotalCost } from "../../lib/optimization/evaluation"
 import { ConstraintParameters, ConstraintViolation, OptimizationParameters, WorkloadEvaluation } from "../../lib/types/common"
 import { ScheduleEntry } from "../../lib/types/schedule"
+import { getWorkloadEvaluations } from "../../lib/metrics"
 
 
 export type SchedulerParameters = {
@@ -87,7 +88,7 @@ export function generateSchedule(
             constraintViolations
         }
 
-        const workloadEvaluations = [] // TODO
+        const workloadEvaluations = getWorkloadEvaluations(scheduleSpecification, entries)
 
         callback({
             success: true,

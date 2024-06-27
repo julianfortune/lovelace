@@ -4,6 +4,8 @@ export function toIndexMap<T>(arr: Array<T>): Map<number, T> {
     return new Map((arr.map((value, index) => [index, value])))
 }
 
+export const sum = (a: number, b: number) => a + b
+
 export const mapToArray = <K, A>(map: Map<K, A>) => [...map.entries()]
 
 export const valuesToArray = <K, A>(map: Map<K, A>) => [...map.values()]
@@ -41,3 +43,26 @@ export const chooseRandomElements = <T>(arr: T[], n: number): T[] => {
 
 // Utility function to convert Date to DateString
 export const toDateString = (date: Date): DateString => date.toISOString().split('T')[0];
+
+// Helper function to parse date strings into Date objects
+export function parseDate(dateStr: DateString): Date {
+    return new Date(dateStr);
+}
+
+// Helper function to get the number of days between two dates
+export function daysBetween(d1: Date, d2: Date): number {
+    const diffTime = Math.abs(d2.getTime() - d1.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+export function pairwise<T>(arr: T[]): [T, T][] {
+    if (arr.length < 2) throw Error()
+
+    return arr.slice(0, -1).map((x, i) => [x, arr[i + 1]])
+}
+
+export function daysBetweenEach(dates: Date[]): number[] {
+    return pairwise(dates).map(([first, second]) => {
+        return daysBetween(first, second)
+    })
+}

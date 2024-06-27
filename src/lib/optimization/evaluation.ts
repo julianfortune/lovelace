@@ -1,18 +1,7 @@
-import { mapToArray, toDateString } from "../util"
+import { daysBetween, mapToArray, parseDate, sum, toDateString } from "../util"
 import { ConstraintParameters, ConstraintViolation, DateString, ShiftName, WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
 import { ScheduleEntry } from "../types/schedule"
-
-// Helper function to parse date strings into Date objects
-function parseDate(dateStr: DateString): Date {
-    return new Date(dateStr);
-}
-
-// Helper function to get the number of days between two dates
-function daysBetween(d1: Date, d2: Date): number {
-    const diffTime = Math.abs(d2.getTime() - d1.getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-}
 
 // Counts all instances where a worker is assigned to overlapping shifts
 export function evaluateWorkerAssignments(
@@ -127,8 +116,6 @@ function findWorkerSelectionViolations(
         })
     })
 }
-
-const sum = (a: number, b: number) => a + b
 
 export function evaluateSchedule(
     spec: ScheduleSpecification,

@@ -52,7 +52,7 @@ export function findDatesForDaysOfTheWeek(start: Date, end: Date, weekDays: Week
     })
 }
 
-export function findAllDateStrings(start: Date, end: Date, pattern: DatePattern): Set<DateString> {
+export function findAllDateStrings(start: Date, end: Date, holidays: Date[], pattern: DatePattern): Set<DateString> {
     let dates = new Set<DateString>()
 
     if (pattern.weekDays !== "All" && pattern.weekDays.length > 0) {
@@ -65,6 +65,7 @@ export function findAllDateStrings(start: Date, end: Date, pattern: DatePattern)
 
     pattern.including.forEach((x) => { dates.add(toDateString(x)) })
     pattern.excluding.forEach((x) => { dates.delete(toDateString(x)) })
+    holidays.forEach((x) => { dates.delete(toDateString(x)) })
 
     return dates
 }
@@ -74,7 +75,7 @@ export function convertYamlScheduleInputsV1ToScheduleSpecification(
 ): ScheduleSpecification {
     const workersMap: Map<WorkerName, WorkerSpecification> = new Map(
         inputs.workers.map(worker => {
-            const availability = findAllDateStrings(inputs.start, inputs.end, worker.availability);
+            const availability = findAllDateStrings(inputs.start, inputs.end, inputs.holidays, worker.availability);
             return [worker.name, {
                 availability,
                 minimumRestDays: 1, // TODO: Make configurable
@@ -86,7 +87,9 @@ export function convertYamlScheduleInputsV1ToScheduleSpecification(
     const shiftsMap: Map<ShiftName, ShiftSpecification> = new Map(
         inputs.shifts.map(shift => {
             const occurrences: Map<DateString, ShiftOccurrenceSpecification> = new Map(
-                Array.from(findAllDateStrings(inputs.start, inputs.end, shift.schedule)).map(dateString => {
+                Array.from(findAllDateStrings(
+                    inputs.start, inputs.end, inputs.holidays, shift.schedule
+                )).map(dateString => {
                     const maxWorkerCount = 1; // TODO: Make configurable
                     return [dateString, { maxWorkerCount }];
                 })

@@ -1,19 +1,19 @@
-import { eachDayOfInterval, endOfWeek, format, isAfter, isBefore, isWeekend, startOfWeek } from 'date-fns';
-import { Ref, useRef } from "react";
+import { Ref, useRef, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import { SchedulerParameters, findSchedule } from './core/scheduler';
-import { Schedule } from './components/Schedule';
+import { ScheduleData, SchedulerResult, generateSchedule } from './core/scheduler';
+import { ScheduleGrid } from './components/schedule/ScheduleGrid';
+import { EvaluationDashboard } from "./components/EvaluationDashboard";
 
 
 function App() {
   const inputElement: Ref<HTMLInputElement> = useRef(null)
 
-  // TODO: Use some sort of form framework ..?
+  const [scheduleData, setScheduleData] = useState<ScheduleData | undefined>(undefined);
 
-  const onSubmit = () => {
+  const onClickGenerate = () => {
     const file = inputElement.current?.files?.item(0)
 
-    // TODO: Gather inputs from interface/react values
+    // TODO: Connect to interface
     let inputs = {
       constraintParameters: {
         backupWorkerCost: 5,
@@ -25,12 +25,11 @@ function App() {
       }
     }
 
-    findSchedule(file, inputs, (result) => {
+    generateSchedule(file, inputs, (result) => {
       if (!result.success) {
         alert(result.errorMessage)
       } else {
-        // TODO: Plug results into interface/react value
-        // ...
+        setScheduleData(result.data)
       }
     })
   }
@@ -60,10 +59,10 @@ function App() {
               <p className="text-sm">File must be in YAML format</p>
             </div>
             <button
-              onClick={onSubmit}
+              onClick={onClickGenerate}
               className="px-4 py-2 border rounded hover:bg-neutral-300 border-neutral-300"
             >
-              Submit
+              Generate
             </button>
           </aside>
         </div>
@@ -77,8 +76,8 @@ function App() {
               <div className="bg-neutral-50 h-16 px-4 border-b-2 border-neutral-200 flex text-neutral-400 items-center">
                 {/* TODO(..?): Tab component ? */}
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center">Schedule</Tab>
-                <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Problems</Tab>
                 <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Evaluation</Tab>
+                <Tab className="flex-grow-0 h-full px-4 pb-1 font-medium hover:cursor-pointer flex items-center ">Workers</Tab>
 
                 <div className="flex-grow "></div>
                 {/* Action buttons */}
@@ -92,18 +91,21 @@ function App() {
             <div className="w-full overflow-auto bg-neutral-100">
               <main>
                 <TabPanel>
-                  <Schedule
-                    start={new Date("2024-01-01")}
-                    end={new Date("2024-01-14")}
-                    entries={[]}
-                  />
+                  {scheduleData?.schedule ? (
+                    <ScheduleGrid schedule={scheduleData.schedule} />
+                  ) : (
+                    <div className="p-12">No schedule available</div>
+                  )}
                 </TabPanel>
 
                 <TabPanel>
-                  {/* TODO: Component */}
-                  <div className="p-12">
-                    <p>No problems</p>
-                  </div>
+                  {scheduleData?.evaluation ? (
+                    <EvaluationDashboard evaluation={scheduleData?.evaluation} />
+                  ) : (
+                    <div className="p-12">
+                      <p>No problems</p>
+                    </div>
+                  )}
                 </TabPanel>
 
                 <TabPanel>

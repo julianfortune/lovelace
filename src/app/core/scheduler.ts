@@ -3,7 +3,7 @@ import { convertYamlScheduleInputsV1ToScheduleSpecification, parseYamlScheduleIn
 import { createRandomSchedule, getRandomAdjacentSchedule } from "../../lib/optimization/annealing"
 import { evaluateSchedule, getSchedulePenalty } from "../../lib/optimization/evaluation"
 import { ConstraintParameters, ConstraintViolation, OptimizationParameters, WorkloadEvaluation } from "../../lib/types/common"
-import { Schedule } from "../../lib/types/schedule"
+import { ScheduleEntry } from "../../lib/types/schedule"
 
 
 export type SchedulerParameters = {
@@ -11,17 +11,33 @@ export type SchedulerParameters = {
     optimizationParameters: OptimizationParameters
 }
 
+export type Schedule = {
+    entries: ScheduleEntry[]
+    start: Date
+    end: Date
+    holidays: Date[]
+}
+
+export type Evaluation = {
+    totalCost: number
+    constraintViolations: ConstraintViolation[]
+}
+
+export type ScheduleData = {
+    schedule: Schedule
+    evaluation: Evaluation
+    workloadEvaluations: WorkloadEvaluation[]
+}
+
 export type SchedulerResult = {
     success: true
-    schedule: Schedule,
-    constraintViolations: ConstraintViolation[],
-    workloadEvaluations: WorkloadEvaluation[]
+    data: ScheduleData
 } | {
     success: false,
     errorMessage: string
 }
 
-export function findSchedule(
+export function generateSchedule(
     file: File | null | undefined,
     parameters: SchedulerParameters,
     callback: (result: SchedulerResult) => void
@@ -42,26 +58,47 @@ export function findSchedule(
             return
         }
 
+        console.log(scheduleInputs.data.holidays)
+
         const scheduleSpecification = convertYamlScheduleInputsV1ToScheduleSpecification(scheduleInputs.data)
 
         // TODO: Do some sanity checks ...
 
-        const schedule = SimulatedAnnealing.run(
+        const entries = SimulatedAnnealing.run(
             createRandomSchedule(scheduleSpecification),
             (state) => getSchedulePenalty(scheduleSpecification, parameters.constraintParameters, state),
             (state) => getRandomAdjacentSchedule(scheduleSpecification, state),
             { maxSteps: parameters.optimizationParameters.maxSteps }
         )
 
+        const schedule: Schedule = {
+            entries,
+            holidays: scheduleInputs.data.holidays,
+            start: scheduleInputs.data.start,
+            end: scheduleInputs.data.end,
+        }
+
         // Gather auxiliary results
-        const constraintViolations = evaluateSchedule(scheduleSpecification, parameters.constraintParameters, schedule)
+        const constraintViolations = evaluateSchedule(
+            scheduleSpecification, parameters.constraintParameters, entries
+        )
+        const totalCost = getSchedulePenalty(scheduleSpecification, parameters.constraintParameters, entries)
+
+        const evaluation: Evaluation = {
+            totalCost,
+            constraintViolations
+        }
+
         const workloadEvaluations = [] // TODO
 
-        return {
+        callback({
             success: true,
-            schedule,
-            constraintViolations,
-            workloadEvaluations
-        }
+            data: {
+                schedule,
+                evaluation,
+                workloadEvaluations
+            }
+        })
+        return
     }
 }

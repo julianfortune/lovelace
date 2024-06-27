@@ -10,13 +10,17 @@ export const WeekDaySchema = z.union([
 
 export type WeekDay = z.infer<typeof WeekDaySchema>
 
+export const UtcDate = z.date().transform((localDate) =>
+    new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60000)
+)
+
 export const DatePatternSchema = z.object({
     weekDays: z.union([
         z.array(WeekDaySchema),
         z.literal("All")
     ]).default([]),
-    excluding: z.array(z.date()).default([]),
-    including: z.array(z.date()).default([]),
+    excluding: z.array(UtcDate).default([]),
+    including: z.array(UtcDate).default([]),
 })
 
 export const WorkerInputSchema = z.object({
@@ -36,9 +40,9 @@ export const ShiftInputSchema = z.object({
 export const ScheduleInputsV1Schema = z.object({
     version: z.literal(1),
     title: z.string(),
-    start: z.date(),
-    end: z.date(),
-    holidays: z.array(z.date()).optional().default([]),
+    start: UtcDate,
+    end: UtcDate,
+    holidays: z.array(UtcDate).optional().default([]),
     workers: z.array(WorkerInputSchema),
     shifts: z.array(ShiftInputSchema),
 })

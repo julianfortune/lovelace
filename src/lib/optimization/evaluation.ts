@@ -1,7 +1,7 @@
 import { mapToArray, toDateString } from "../util"
 import { ConstraintParameters, ConstraintViolation, DateString, ShiftName, WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
-import { Schedule } from "../types/schedule"
+import { ScheduleEntry } from "../types/schedule"
 
 // Helper function to parse date strings into Date objects
 function parseDate(dateStr: DateString): Date {
@@ -90,7 +90,7 @@ export function evaluateWorkerAssignments(
 }
 
 // Find what shifts a worker is assigned to for the dates that they're assigned to work
-export function findWorkerSchedule(schedule: Schedule, worker: WorkerName): Map<DateString, Set<ShiftName>> {
+export function findWorkerSchedule(schedule: ScheduleEntry[], worker: WorkerName): Map<DateString, Set<ShiftName>> {
     var workerShiftsByDate: Map<DateString, Set<ShiftName>> = new Map()
 
     schedule.forEach(({ shift, date, workers }) => {
@@ -112,7 +112,7 @@ const sum = (a: number, b: number) => a + b
 export function evaluateSchedule(
     spec: ScheduleSpecification,
     constraintParameters: ConstraintParameters,
-    schedule: Schedule
+    schedule: ScheduleEntry[]
 ): ConstraintViolation[] {
     // Go through all the workers and check for constraint violations
     const workerConstraintViolations = mapToArray(spec.workers).flatMap(([workerName]) => {
@@ -143,7 +143,7 @@ export function evaluateSchedule(
 export function getSchedulePenalty(
     spec: ScheduleSpecification,
     constraintParameters: ConstraintParameters,
-    schedule: Schedule,
+    schedule: ScheduleEntry[],
 ): number {
     // Go through all the workers and check for constraint violations
     const constraintViolations = evaluateSchedule(spec, constraintParameters, schedule)

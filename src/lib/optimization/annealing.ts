@@ -2,12 +2,10 @@ import cloneDeep from "lodash.clonedeep"
 import { chooseRandomElements, getRandomElement, getRandomElementWithIndex } from "../util"
 import { WorkerName } from "../types/common"
 import { ScheduleSpecification } from "../types/specification"
-import { Schedule, ScheduleEntry } from "../types/schedule"
-import { SimulatedAnnealing } from "simulated-annealing-ts"
-import { evaluateSchedule, getSchedulePenalty } from "./evaluation"
+import { ScheduleEntry } from "../types/schedule"
 
 
-export function createRandomSchedule(specification: ScheduleSpecification): Schedule {
+export function createRandomSchedule(specification: ScheduleSpecification): ScheduleEntry[] {
     return Array.from(specification.shifts.entries()).flatMap(([shift, shiftSpecification]) => {
         return Array.from(shiftSpecification.occurrences.entries()).map(([date, occurrenceSpecification]) => {
             const possibleWorkers = findAlternateWorkers({ shift, date, workers: new Set() }, specification)
@@ -98,7 +96,7 @@ export function findAlternateWorkers(
 
 // TODO: Figure out which `ScheduleEntry`s have alternate workers available before optimizing; use that
 // array to pick a random scheduleEntry (prevents retries and allows erroring gracefully if nothing can be optimized)
-export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: Schedule): Schedule {
+export function getRandomAdjacentSchedule(spec: ScheduleSpecification, initial: ScheduleEntry[]): ScheduleEntry[] {
     // Pick random entry in schedule
     const [scheduleEntry, scheduleIndex] = getRandomElementWithIndex(initial)
 

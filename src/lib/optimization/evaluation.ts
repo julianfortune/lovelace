@@ -83,7 +83,8 @@ export function evaluateWorkerAssignments(
         if (workload > workerSpec.targetWorkload) {
             constraintViolations.push({
                 hard: false,
-                penalty: workload - workerSpec.targetWorkload, // TODO: Raise to a power? E.g., square ?
+                // Square the difference to penalize going over more than going over a little (exponentially)
+                penalty: Math.pow((workload - workerSpec.targetWorkload), 2),
                 message: `${workerName} has workload of ${workload} for ${month} (aiming for ${workerSpec.targetWorkload})`
             });
         }

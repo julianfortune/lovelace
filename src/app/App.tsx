@@ -12,7 +12,7 @@ function App() {
 
   const [scheduleData, setScheduleData] = useState<ScheduleData | undefined>(undefined);
 
-  const [backupWorkerCost, setBackupWorkerCost] = useState(5);
+  const [backupWorkerCost, setBackupWorkerCost] = useState(10);
   const [overlappingShiftsCost, setOverlappingShiftsCost] = useState(200);
   const [insufficientRestCost, setInsufficientRestCost] = useState(100);
   const [weeklyWorkloadEnabled, setWeeklyWorkloadEnabled] = useState(false);

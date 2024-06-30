@@ -7,7 +7,7 @@ export type WorkersProps = {
 
 export function WorkersTable({ evaluations }: WorkersProps) {
   // Extract unique workers and months
-  const workers = Array.from(new Set(evaluations.map(e => e.worker)));
+  const workers = Array.from(new Set(evaluations.map(e => e.worker))).sort();
   const months = Array.from(new Set(evaluations.map(e => e.month)));
 
   // Create a mapping of workers to their workload evaluations by month

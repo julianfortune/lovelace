@@ -2,6 +2,7 @@
 
 ## TODO
 
+- [ ] Make sure schedule can work with arbitrary sub-range of dates
 - [ ] Some sort of table / spreadsheet export
 
 *Stretch*

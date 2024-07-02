@@ -1,5 +1,4 @@
-import { eachDayOfInterval, endOfWeek, format, isAfter, isBefore, isSameDay, isWeekend, startOfWeek } from 'date-fns';
-import { ScheduleEntry } from '../../../lib/types/schedule';
+import { eachDayOfInterval, endOfWeek, format, isAfter, isBefore, isSameDay, startOfWeek } from 'date-fns';
 import { Day } from './Day';
 import { Schedule } from '../../core/scheduler';
 
@@ -12,9 +11,7 @@ export function ScheduleGrid({ schedule: { start, end, holidays, entries } }: Sc
   const firstDate = startOfWeek(start)
   const lastDate = endOfWeek(end)
   const days = eachDayOfInterval({ start: firstDate, end: lastDate });
-
-  console.log(start, end, holidays)
-
+  
   const renderDays = () => {
     return days.map(day => {
       const isInSchedule = isSameDay(day, start) || (isAfter(day, start) && isBefore(day, end)) || isSameDay(day, end)
@@ -36,7 +33,7 @@ export function ScheduleGrid({ schedule: { start, end, holidays, entries } }: Sc
   };
 
   return (
-    <div className="p-12 grid xl:grid-cols-7 gap-2" >
+    <div className="p-12 grid xl:grid-cols-5 gap-2" >
       {renderDays()}
     </div>
   )

@@ -44,7 +44,7 @@ export function WorkersTable({ evaluations }: WorkersProps) {
                   <td key={month} className="px-4 py-2 text-center text-neutral-800">
                     {workerMonthMap[worker][month] !== undefined
                       ? workerMonthMap[worker][month]
-                      : 'N/A'}
+                      : '-'}
                   </td>
                 ))}
               </tr>

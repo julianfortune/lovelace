@@ -2,8 +2,9 @@
 
 ## TODO
 
-- [ ] Make sure schedule can work with arbitrary sub-range of dates
-- [ ] Some sort of table / spreadsheet export
+- [ ] Finish example YAML file and ensure viewable on deployed site.
+- [ ] Finish DOCX export
+- [ ] Send Ada invoice
 
 *Stretch*
 - [ ] Add documentation

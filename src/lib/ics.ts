@@ -1,8 +1,4 @@
-// Import necessary types
-interface CalendarEvent {
-    title: string;
-    date: Date;
-}
+
 
 function formatDate(date: Date): string {
     const pad = (num: number): string => num.toString().padStart(2, '0');

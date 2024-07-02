@@ -1,26 +1,27 @@
-import { Ref, useRef, useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import { ScheduleData, generateSchedule } from './core/scheduler';
-import { ScheduleGrid } from './components/schedule/ScheduleGrid';
-import { EvaluationDashboard } from "./components/EvaluationDashboard";
-import { WorkersTable } from "./components/WorkersTable";
-import { concatenateSet } from "../lib/util";
-import { downloadICS } from "../lib/ics";
+import { Ref, useRef, useState } from "react"
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
+import { ScheduleData, generateSchedule } from './core/scheduler'
+import { ScheduleGrid } from './components/schedule/ScheduleGrid'
+import { EvaluationDashboard } from "./components/EvaluationDashboard"
+import { WorkersTable } from "./components/WorkersTable"
+import { concatenateSet } from "../lib/util"
+import { downloadICS } from "../lib/ics"
+import { downloadDocx } from "../lib/docx"
 
 function App() {
-  const inputElement: Ref<HTMLInputElement> = useRef(null);
+  const inputElement: Ref<HTMLInputElement> = useRef(null)
 
-  const [scheduleData, setScheduleData] = useState<ScheduleData | undefined>(undefined);
+  const [scheduleData, setScheduleData] = useState<ScheduleData | undefined>(undefined)
 
-  const [backupWorkerCost, setBackupWorkerCost] = useState(10);
-  const [overlappingShiftsCost, setOverlappingShiftsCost] = useState(200);
-  const [insufficientRestCost, setInsufficientRestCost] = useState(100);
-  const [weeklyWorkloadEnabled, setWeeklyWorkloadEnabled] = useState(false);
-  const [evenShiftDistributionEnabled, setEvenShiftDistributionEnabled] = useState(true);
-  const [maxSteps, setMaxSteps] = useState(4000);
+  const [backupWorkerCost, setBackupWorkerCost] = useState(10)
+  const [overlappingShiftsCost, setOverlappingShiftsCost] = useState(200)
+  const [insufficientRestCost, setInsufficientRestCost] = useState(100)
+  const [weeklyWorkloadEnabled, setWeeklyWorkloadEnabled] = useState(false)
+  const [evenShiftDistributionEnabled, setEvenShiftDistributionEnabled] = useState(true)
+  const [maxSteps, setMaxSteps] = useState(4000)
 
   const onClickGenerate = () => {
-    const file = inputElement.current?.files?.item(0);
+    const file = inputElement.current?.files?.item(0)
 
     let parameters = {
       constraintParameters: {
@@ -33,16 +34,35 @@ function App() {
       optimizationParameters: {
         maxSteps
       }
-    };
+    }
 
     generateSchedule(file, parameters, (result) => {
       if (!result.success) {
-        alert(result.errorMessage);
+        alert(result.errorMessage)
       } else {
-        setScheduleData(result.data);
+        setScheduleData(result.data)
       }
-    });
-  };
+    })
+  }
+
+  const onClickExportDocx = () => {
+    if (scheduleData === undefined) {
+      alert("No schedule available")
+      return
+    }
+
+    const calendarEvents = scheduleData?.schedule.entries.map((e) => {
+      const title = `${e.shift}: ${concatenateSet(e.workers)}`
+      return { title, dateString: e.date, date: new Date(e.date) }
+    })
+
+    downloadDocx(
+      calendarEvents,
+      scheduleData.schedule.start,
+      scheduleData.schedule.end,
+      `${scheduleData.title}.docx`
+    )
+  }
 
   const onClickExportIcs = () => {
     if (scheduleData === undefined) {
@@ -52,7 +72,7 @@ function App() {
 
     const calendarEvents = scheduleData?.schedule.entries.map((e) => {
       const title = `${e.shift}: ${concatenateSet(e.workers)}`
-      return { title, date: new Date(e.date) }
+      return { title, dateString: e.date, date: new Date(e.date) }
     })
 
     downloadICS(calendarEvents, `${scheduleData.title}.ics`)
@@ -75,7 +95,7 @@ function App() {
               accept=".yaml"
               className="w-64 block border border-neutral-300 rounded-md shadow-smoverflow-clip file:border-none file:px-2 file:py-1 file:cursor-pointer file:font-medium"
             />
-            <p className="text-sm">File must be in YAML format</p>
+            <p className="text-sm">File must be in YAML format, demonstrated in this <a href="/example.yaml" className="underline text-blue-400">example</a>.</p>
           </div>
 
           <h2 className="text-lg font-bold">Constraint Parameters</h2>
@@ -163,6 +183,10 @@ function App() {
               {/* Action buttons */}
               <div className="pl-4 text-end text-neutral-600 border-neutral-200 border-l-2 space-x-4 flex items-baseline">
                 <p>Export</p>
+                <button
+                  className="px-4 py-1 border rounded-full font-medium hover:cursor-pointer"
+                  onClick={onClickExportDocx}
+                >docx</button>
                 <button
                   className="px-4 py-1 border rounded-full font-medium hover:cursor-pointer"
                   onClick={onClickExportIcs}

@@ -14,8 +14,6 @@ export function getWorkloadEvaluations(
         x.date.slice(0, 7) // Extracting the "YYYY-MM" part of the date
     ))).sort()
 
-    console.log(">>> Months:", months)
-
     return mapToArray(spec.workers).flatMap(([workerName]) => {
         const assignments = findWorkerSchedule(schedule, workerName) // all the days scheduled
 

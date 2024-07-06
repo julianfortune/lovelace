@@ -95,7 +95,7 @@ function App() {
               accept=".yaml"
               className="w-64 block border border-neutral-300 rounded-md shadow-smoverflow-clip file:border-none file:px-2 file:py-1 file:cursor-pointer file:font-medium"
             />
-            <p className="text-sm">File must be in YAML format, demonstrated in this <a href="/example.yaml" className="underline text-blue-400">example</a>.</p>
+            <p className="text-sm pt-2">File must be in YAML format, demonstrated in this <a href="/example.yaml" className="underline text-blue-400">example</a>.</p>
           </div>
 
           <h2 className="text-lg font-bold">Constraint Parameters</h2>

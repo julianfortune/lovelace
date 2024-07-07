@@ -3,6 +3,7 @@ import { ConstraintParameters, ConstraintViolation, DateString, ShiftName, Worke
 import { ScheduleSpecification } from "../types/specification"
 import { ScheduleEntry } from "../types/schedule"
 import { variance } from "mathjs"
+import { format } from "date-fns"
 
 // Counts all instances where a worker is assigned to overlapping shifts
 export function evaluateWorkerAssignments(
@@ -53,11 +54,13 @@ export function evaluateWorkerAssignments(
             })
             const restVariance = Math.floor(Number(variance(restDayCount, 'unbiased')) / 2)
 
-            constraintViolations.push({
-                hard: false,
-                penalty: restVariance,
-                message: `${workerName} has rest variance of ${restVariance}`
-            })
+            if (restVariance > 0) {
+                constraintViolations.push({
+                    hard: false,
+                    penalty: restVariance,
+                    message: `${workerName} has rest variance of ${restVariance}`
+                })
+            }
         }
     }
 
@@ -81,11 +84,12 @@ export function evaluateWorkerAssignments(
 
     workloadPerMonth.forEach((workload, month) => {
         if (workload > workerSpec.targetWorkload) {
+            const monthName = format(`${month}-07`, 'MMMM') // Ends up as the prior month if using the 1st
             constraintViolations.push({
                 hard: false,
                 // Square the difference to penalize going over more than going over a little (exponentially)
                 penalty: Math.pow((workload - workerSpec.targetWorkload), 2),
-                message: `${workerName} has workload of ${workload} for ${month} (aiming for ${workerSpec.targetWorkload})`
+                message: `${workerName} has workload of ${workload} for ${monthName} (aiming for ${workerSpec.targetWorkload})`
             });
         }
     });

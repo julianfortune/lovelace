@@ -52,7 +52,7 @@ function App() {
     }
 
     const calendarEvents = scheduleData?.schedule.entries.map((e) => {
-      const title = `${e.shift}: ${concatenateSet(e.workers)}`
+      const title = `${e.shift}  ${concatenateSet(e.workers)}`
       return { title, dateString: e.date, date: new Date(e.date) }
     })
 

@@ -1,12 +1,31 @@
-import { Document, Packer, Table, TableRow, TableCell, Paragraph, TextRun, WidthType } from "docx"
+import { Document, Packer, Table, TableRow, TableCell, Paragraph, TextRun, WidthType, AlignmentType, PageOrientation } from "docx"
 import { eachDayOfInterval, getDay, format, endOfWeek, startOfWeek, isWeekend, isSameDay, formatDate } from "date-fns"
 
 
 export function downloadDocx(events: CalendarEvent[], start: Date, end: Date, fileName: string): void {
     // Helper function to create a table cell
-    const createCell = (text: string) => {
+    const createHeaderCell = (text: string) => {
         return new TableCell({
-            children: [new Paragraph({ children: [new TextRun(text)] })],
+            children: [
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun(text + "\n")]
+                })
+            ],
+        })
+    }
+
+    const createCalendarCell = (date: Date, lines: string[]) => {
+        const dateString = formatDate(date, "MMMM dd")
+        const dateParagraph = new Paragraph({
+            alignment: AlignmentType.RIGHT, // Right justify
+            children: [new TextRun({ text: dateString + "\n", bold: true })]
+        })
+
+        return new TableCell({
+            children: [dateParagraph].concat(lines.map((line) => {
+                return new Paragraph({ children: [new TextRun(line + "\n")] })
+            })),
         })
     }
 
@@ -19,7 +38,7 @@ export function downloadDocx(events: CalendarEvent[], start: Date, end: Date, fi
     // Weekday headers
     const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
     const headerRow = new TableRow({
-        children: weekdays.map(day => createCell(day)),
+        children: weekdays.map(day => createHeaderCell(day)),
         tableHeader: true,
     })
 
@@ -32,9 +51,9 @@ export function downloadDocx(events: CalendarEvent[], start: Date, end: Date, fi
             // Filter the entries for the current day
             const formattedDay = format(date, 'yyyy-MM-dd');
             const eventsOnThisDay = events.filter(e => formattedDay === e.dateString)
-            const cellText = `${formatDate(date, "MMMM dd")}\n${eventsOnThisDay.map(event => event.title).join("\n")}`
+            const cellText = eventsOnThisDay.map(event => event.title)
 
-            currentRow.push(createCell(cellText))
+            currentRow.push(createCalendarCell(date, cellText))
         }
 
         if (getDay(date) === 6 || date.getDate() === days.length) {
@@ -48,12 +67,8 @@ export function downloadDocx(events: CalendarEvent[], start: Date, end: Date, fi
         sections: [{
             children: [
                 new Table({
-                    columnWidths: [2000, 2000, 2000, 2000, 2000],
+                    columnWidths: [4000, 4000, 4000, 4000, 4000],
                     rows: rows,
-                    // width: {
-                    //     size: 4000,
-                    //     type: WidthType.DXA,
-                    // }
                 }),
             ],
         }]

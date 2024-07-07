@@ -58,7 +58,6 @@ workers:
   - name: Mason
     targetWorkload: 20
     availability:
-      weekDays: All
       excluding:
         - 2024-05-01
         - 2024-05-02
@@ -81,11 +80,11 @@ workers:
         - 2024-06-12
 
   - name: Jill
-    targetWorkload: 4
+    targetWorkload: 0
     availability: {}
 
   - name: Emily
-    targetWorkload: 1
+    targetWorkload: 0
     availability: {}
 
   - name: Ron
@@ -292,7 +291,7 @@ workers:
   - name: Juniper
     targetWorkload: 26
     availability:
-      weekDays: All
+      weekDays: [M, Th]
       excluding:
         - 2024-05-03
         - 2024-05-06
@@ -427,10 +426,23 @@ shifts:
       - Courtney
       - Jill
 
-  - name: GWY # Gateway
-    workload: 6
+  - name: GWY4 # Gateway
+    workload: 4
     schedule:
-      weekDays: [M, Tu, Th, F]
+      weekDays: [M, Tu]
+    primary:
+      - Juniper
+      - Ivette
+      - Bernadette
+    backup:
+      - Courtney
+      - Shelby W
+      - Mason
+
+  - name: GWY3 # Gateway
+    workload: 3
+    schedule:
+      weekDays: [Th, F]
     primary:
       - Juniper
       - Ivette

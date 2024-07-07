@@ -22,6 +22,7 @@ export function Day({
       className={
         `flex flex-col p-3 min-h-32
          border rounded shadow-sm
+         bg-neutral-50
          ${dateIsToday ? 'border-red-400' : ''}
          ${isHoliday ? '!bg-blue-100 !text-blue-600' : ''}
          ${isDisabled ? 'text-neutral-400 !bg-neutral-100' : ''}`

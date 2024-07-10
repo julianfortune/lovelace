@@ -88,7 +88,11 @@ export function findAlternateWorkers(
 
     return allCandidates.filter((c: WorkerName) => {
         const availability = spec.workers.get(c)?.availability
-        if (availability == undefined) { throw Error(`No availability found for ${c}`) }
+
+        if (availability == undefined) {
+            console.warn(`No availability found for ${c}`)
+            return false
+        }
 
         return availability.has(scheduleEntry.date) && !scheduleEntry.workers.has(c)
     })

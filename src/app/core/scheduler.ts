@@ -1,10 +1,17 @@
+import yaml from 'js-yaml'
 import { SimulatedAnnealing } from "simulated-annealing-ts"
-import { convertYamlScheduleInputsV1ToScheduleSpecification, parseYamlScheduleInputsV1 } from "../../lib/input/parse"
+import { convertYamlScheduleInputsV1ToScheduleSpecification } from "../../lib/input/parse"
+import { ScheduleInputsV1Schema } from "../../lib/input/types/ScheduleInputsV1"
+import { getWorkloadEvaluations } from "../../lib/metrics"
 import { createRandomSchedule, getRandomAdjacentSchedule } from "../../lib/optimization/annealing"
 import { evaluateSchedule, getScheduleTotalCost, getTotalCost } from "../../lib/optimization/evaluation"
-import { ConstraintParameters, ConstraintViolation, OptimizationParameters, WorkloadEvaluation } from "../../lib/types/common"
+import {
+    ConstraintParameters,
+    ConstraintViolation,
+    OptimizationParameters,
+    WorkloadEvaluation
+} from "../../lib/types/common"
 import { ScheduleEntry } from "../../lib/types/schedule"
-import { getWorkloadEvaluations } from "../../lib/metrics"
 
 
 export type SchedulerParameters = {
@@ -53,7 +60,21 @@ export function generateSchedule(
     reader.readAsText(file)
     reader.onload = (e) => {
         const fileContents = e.target?.result?.toString() ?? ""
-        const scheduleInputs = parseYamlScheduleInputsV1(fileContents)
+
+        if (fileContents.includes('\t')) {
+            callback({ success: false, errorMessage: `Parsing failed: YAML cannot contain tabs` })
+            return
+        }
+
+        var data
+        try {
+            data = yaml.load(fileContents)
+        } catch (error) {
+            callback({ success: false, errorMessage: `Parsing failed: ${error}` })
+            return
+        }
+
+        const scheduleInputs = ScheduleInputsV1Schema.safeParse(data)
 
         if (scheduleInputs.success != true) {
             callback({ success: false, errorMessage: `Parsing failed: ${scheduleInputs.error.message}` })

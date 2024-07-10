@@ -1,16 +1,7 @@
-import yaml from 'js-yaml';
-import { DatePattern, ScheduleInputsV1, ScheduleInputsV1Schema, WeekDay } from "./types/ScheduleInputsV1";
-import { SafeParseReturnType } from 'zod';
-import { ScheduleSpecification, ShiftOccurrenceSpecification, ShiftSpecification, WorkerSpecification } from '../types/specification';
 import { DateString, ShiftName, WorkerName } from '../types/common';
+import { ScheduleSpecification, ShiftOccurrenceSpecification, ShiftSpecification, WorkerSpecification } from '../types/specification';
 import { toDateString } from '../util';
-
-export function parseYamlScheduleInputsV1(
-    fileContents: string
-): SafeParseReturnType<unknown, ScheduleInputsV1> {
-    const data = yaml.load(fileContents)
-    return ScheduleInputsV1Schema.safeParse(data)
-}
+import { DatePattern, ScheduleInputsV1, WeekDay } from "./types/ScheduleInputsV1";
 
 let dayInMs = 24 * 60 * 60 * 1000
 let weekInMs = (7 * dayInMs)

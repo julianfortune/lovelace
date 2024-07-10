@@ -92,7 +92,7 @@ function App() {
               type="file"
               name="file"
               ref={inputElement}
-              accept=".yaml"
+              accept=".yaml,.yml,.txt"
               className="w-64 block border border-neutral-300 rounded-md shadow-smoverflow-clip file:border-none file:px-2 file:py-1 file:cursor-pointer file:font-medium"
             />
             <p className="text-sm pt-2">File must be in YAML format, demonstrated in this <a href="/lovelace/example.yaml" className="underline text-blue-400">example</a>.</p>
